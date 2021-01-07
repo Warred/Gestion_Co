@@ -4,4 +4,12 @@
   <artifactId>Projet_6</artifactId>
   <version>0.0.1-SNAPSHOT</version>
   <name>Projet_6</name>
+  <dependencies>
+	  <!-- https://mvnrepository.com/artifact/org.postgresql/postgresql -->
+		<dependency>
+		    <groupId>org.postgresql</groupId>
+		    <artifactId>postgresql</artifactId>
+		    <version>42.2.18</version>
+		</dependency>
+	</dependencies>
 </project>
