@@ -133,7 +133,7 @@ public class TestJFrame extends JFrame implements ActionListener{
 	    JLabel search = new JLabel("Rechercher par nom :");
 	    c.gridx = 0;
 	    c.gridwidth = 0;
-	    c.gridy = 0;
+	    c.gridy = 1;
 	    panelDroite.add(search, c);
 	    
 	    recherche = new JTextField(15);
@@ -206,8 +206,34 @@ public class TestJFrame extends JFrame implements ActionListener{
 				}
 			} else JOptionPane.showMessageDialog(this, "Remplir tout les renseignements pour ajouter un article");
 		
-		} else if (clic.getSource() == jtableArt) {
-			System.out.println("ok");
+		} else if (clic.getSource() == buttonOK) {
+			String str = recherche.getText().toLowerCase();
+			System.out.println(str);
+			if (!str.isEmpty()) {
+				boolean trouve = false;
+				String nomTable = "article where lib_article ilike '%" + str + "%'";
+				String sql = "select * from " + nomTable + " order by ref_article";
+				System.out.println(sql);
+				
+				for (int i = 0; i < modelArt.getRowCount(); i++) {
+					if (modelArt.getValueAt(i, 1).toString().toLowerCase().contains(str)) {						
+						jtableArt.changeSelection(i, 0, false, false);
+						trouve = true;
+					}
+				}
+				if (trouve) {
+					DefaultTableModel modelRech = getModel(nomTable);
+					jtableArt.setModel(modelRech);
+				} else{
+					JOptionPane.showMessageDialog(this, "Le nom '" + str +"' n'est pas dans le tableau");
+					jtableArt.setModel(modelArt);
+				}
+			} else{
+				JOptionPane.showMessageDialog(this, "Entrer un nom dans la recherche");
+				jtableArt.setModel(modelArt);
+			}
+			
+			
 		} else if (clic.getSource() == editArticle) {
 			if (jtableArt.getSelectedRow() != -1) {
 				if (formulaireFull(panelTextArticle)) {
@@ -303,9 +329,7 @@ public class TestJFrame extends JFrame implements ActionListener{
 				modelTmp.addRow(row);
 			}
 			modelArt = modelTmp;
-			jtableArt.setModel(modelArt);
-			
-			
+			jtableArt.setModel(modelArt);			
 			
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -392,8 +416,11 @@ public class TestJFrame extends JFrame implements ActionListener{
 				
 				for (int i = 1; i <= nbCol; i++) {
 					result.getObject(i);
-					if (!result.wasNull()) row[i-1] = result.getObject(i).toString();
-				}				
+					if (!result.wasNull()) {
+						
+						row[i-1] = result.getObject(i).toString();
+					}
+				}
 				modelTmp.addRow(row);
 			}
 				
