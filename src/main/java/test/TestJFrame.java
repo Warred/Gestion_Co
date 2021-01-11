@@ -3,14 +3,13 @@ package test;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
-import java.awt.Label;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.Connection;
+import java.sql.DatabaseMetaData;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
@@ -19,14 +18,18 @@ import java.util.ArrayList;
 
 import javax.swing.*;
 import javax.swing.border.Border;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+import javax.swing.event.TableModelEvent;
+import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.text.TabableView;
 
 public class TestJFrame extends JFrame implements ActionListener{
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1209646065885814522L;
+	private static int lastIndexArt = -1;
 	JTextField libelle = new JTextField(15);
 	JTextField pxAchat = new JTextField(15);
 	JTextField pxVente = new JTextField(15);
@@ -40,15 +43,15 @@ public class TestJFrame extends JFrame implements ActionListener{
 	DefaultTableModel modelArt = new DefaultTableModel();
 	JTable jtableArt = new JTable(modelArt);
 	JPanel panelTextArticle = new JPanel();
+	JTabbedPane tab = new JTabbedPane();
 	
 	public TestJFrame() {
 		setTitle("Gestion Commerciale V1");
  	    setBounds(100,100,1000,500); 
  	    
  	    //
- 	    JTabbedPane tab = new JTabbedPane();
+
  	    JPanel panelComm = new JPanel();
- 	    JPanel panelArt = new JPanel();
  	    JPanel panelTiers = new JPanel();
  	    JPanel panelStock = new JPanel();
 	    
@@ -135,17 +138,17 @@ public class TestJFrame extends JFrame implements ActionListener{
 	    
 	    recherche = new JTextField(15);
 	    c.gridx = 0;
-	    c.gridy = 1;
+	    c.gridy = 2;
 	    panelDroite.add(recherche, c);
 	    
 	    buttonOK = new JButton("Ok");
 	    c.gridx = 0;
 	    c.gridy = 3;
 	    panelDroite.add(buttonOK, c);
-	    JLabel vide5 = new JLabel("");
-	    c.gridx = 0;
-	    c.gridy = 5;
-	    panelDroite.add(vide5, c);	    
+//	    JLabel vide5 = new JLabel("");
+//	    c.gridx = 0;
+//	    c.gridy = 5;
+//	    panelDroite.add(vide5, c);	    
 	    
 	    panelHaut.add(panelLabel);
 	    panelHaut.add(panelTextArticle);
@@ -159,8 +162,8 @@ public class TestJFrame extends JFrame implements ActionListener{
 	    panelFond.add(panelHaut);
 	    panelFond.add(sp);
 	    
-	    tab.add("Articles", panelFond);
-	    tab.add("Commandes", panelComm);
+	    tab.add("Article", panelFond);
+	    tab.add("Commande", panelComm);
 	    
 	    tab.add("Tiers", panelTiers);
 	    tab.add("Stock", panelStock);
@@ -170,7 +173,20 @@ public class TestJFrame extends JFrame implements ActionListener{
 	    
 	    addArticle.addActionListener(this);
 	    editArticle.addActionListener(this);
-	    buttonOK.addActionListener(this); 	   
+	    buttonOK.addActionListener(this);
+	    jtableArt.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+	        public void valueChanged(ListSelectionEvent event) {
+	        	int index = jtableArt.getSelectedRow();
+	            if (index != lastIndexArt && index > -1) {
+	                libelle.setText(jtableArt.getValueAt(index, 1).toString());
+	                pxAchat.setText(jtableArt.getValueAt(index, 2).toString());
+	                pxVente.setText(jtableArt.getValueAt(index, 3).toString());
+	                stockTrans.setText(jtableArt.getValueAt(index, 4).toString());
+	                stockDispo.setText(jtableArt.getValueAt(index, 5).toString());
+	            }
+	            lastIndexArt = index;
+	        }
+	    });
 	    
 	}
 
@@ -182,32 +198,134 @@ public class TestJFrame extends JFrame implements ActionListener{
 
 	public void actionPerformed(ActionEvent clic) {			
 		if (clic.getSource() == addArticle) {			
-			if (formulaireOK(panelTextArticle)) {
-				
-				ArrayList<String> list = recupText(panelTextArticle);
-				insertSQL("article", list);
-				int nbValeur = list.size()+1;
-				String[] row = new String[nbValeur];
-				row[0] = "default";
-				for (int i = 1; i < nbValeur; i++) {
-					row[i] = list.get(i-1);
+			if (formulaireFull(panelTextArticle)) {				
+				if(insertSQL("article", recupText(panelTextArticle))) {
+					modelArt = getModel("article");
+					jtableArt.setModel(modelArt);
+					videText(panelTextArticle);
 				}
-				modelArt.addRow(row);
-
 			} else JOptionPane.showMessageDialog(this, "Remplir tout les renseignements pour ajouter un article");
-		} else JOptionPane.showMessageDialog(this, "Pas encore codé cette fonction");
+		
+		} else if (clic.getSource() == jtableArt) {
+			System.out.println("ok");
+		} else if (clic.getSource() == editArticle) {
+			if (jtableArt.getSelectedRow() != -1) {
+				if (formulaireFull(panelTextArticle)) {
+					if(updateSQL("article", recupText(panelTextArticle), jtableArt.getValueAt(jtableArt.getSelectedRow(), 0).toString())) {
+						modelArt = getModel("article");
+						jtableArt.setModel(modelArt);
+						videText(panelTextArticle);
+					}
+				} else JOptionPane.showMessageDialog(this, "Remplir tout les renseignements pour ajouter un article");
+			} else JOptionPane.showMessageDialog(this, "Selectionner un article à modifier dans le JTable");
+		}else JOptionPane.showMessageDialog(this, "Pas encore codé cette fonction");
 		
 	}
 		
-	private void insertSQL(String nomTable, ArrayList<String> valeurs) {
+	private boolean insertSQL(String nomTable, ArrayList<String> valeurs) {
 		String sql = "INSERT INTO " + nomTable + " VALUES (default";
-		for (String val : valeurs) {
-			sql += ",'" + val +"'";
-		}
+		for (String val : valeurs) sql += ",'" + val +"'";
 		sql += ");";
 		System.out.println(sql);
-		
-		
+		Connection conn = null;
+		try {
+			Class.forName("org.postgresql.Driver");
+			String url = "jdbc:postgresql://localhost:5432/base_gestion_co?currentSchema=schema_gestion_co";
+			String user = "postgres";
+			String passwd = "bonjour";
+			conn = DriverManager.getConnection(url, user, passwd);
+			Statement state = conn.createStatement();
+			state.execute(sql);
+			JOptionPane.showMessageDialog(this, "Ajout dans la table " + nomTable + " réussi");
+		} catch (Exception e) {
+			e.printStackTrace();
+			JOptionPane.showMessageDialog(this, e.getMessage());
+			return false;
+		}
+		return true;
+	}
+
+	private boolean updateSQL(String nomTable, ArrayList<String> valeurs, String serial) {
+		String sql = "UPDATE " + nomTable + " SET  lib_article = '" + valeurs.get(0) + "', px_achat = '" + valeurs.get(1);
+		sql += "', px_vente = '" + valeurs.get(2) + "', stock_transitionnel = '" + valeurs.get(3);
+		sql += "', stock_dispo = '" + valeurs.get(4) + "' ";
+		sql += "WHERE ref_article = " + serial;
+
+		System.out.println(sql);
+		Connection conn = null;
+		try {
+			Class.forName("org.postgresql.Driver");
+			String url = "jdbc:postgresql://localhost:5432/base_gestion_co?currentSchema=schema_gestion_co";
+			String user = "postgres";
+			String passwd = "bonjour";
+			conn = DriverManager.getConnection(url, user, passwd);
+			Statement state = conn.createStatement();
+			state.execute(sql);
+			JOptionPane.showMessageDialog(this, "Modification dans la table " + nomTable + " réussie");
+		} catch (Exception e) {
+			e.printStackTrace();
+			JOptionPane.showMessageDialog(this, e.getMessage());
+			return false;
+		}
+		return true;
+	}
+
+	private void testRecupConstraints() {
+		Connection conn = null;
+		try {
+			Class.forName("org.postgresql.Driver");
+			String url = "jdbc:postgresql://localhost:5432/base_gestion_co?currentSchema=schema_gestion_co";
+			String user = "postgres";
+			String passwd = "bonjour";
+			conn = DriverManager.getConnection(url, user, passwd);
+			Statement state = conn.createStatement();
+			DatabaseMetaData dm = conn.getMetaData();
+			
+			ResultSet rs = state.executeQuery("");
+			ResultSetMetaData resultMeta = rs.getMetaData();
+						
+			int nbCol = resultMeta.getColumnCount();
+			String[] nomDesColonnes = new String[nbCol];
+			
+			for (int i = 0; i < nbCol; i++) {
+				nomDesColonnes[i]= resultMeta.getColumnName(i+1).toUpperCase();				    
+			}
+			 
+			 DefaultTableModel modelTmp = new DefaultTableModel(nomDesColonnes, 0);
+			
+			while (rs.next()) {
+				String[] row = new String[nbCol];
+				
+				for (int i = 1; i <= nbCol; i++) {
+					rs.getObject(i);
+					if (!rs.wasNull()) row[i-1] = rs.getObject(i).toString();
+				}				
+				modelTmp.addRow(row);
+			}
+			modelArt = modelTmp;
+			jtableArt.setModel(modelArt);
+			
+			
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+			JOptionPane.showMessageDialog(this, e.getMessage());			
+		}
+			
+	}
+
+	private void videText(JPanel nomPanel) {
+		for (Component c : nomPanel.getComponents()) {
+			if (c instanceof JPanel) {
+				JPanel p = (JPanel) c;
+				for (Component txt : p.getComponents()) {
+					if (txt instanceof JTextField) {
+						JTextField t = (JTextField) txt;
+						t.setText("");
+					}
+				}
+			}
+		}		
 	}
 
 	private ArrayList<String> recupText(JPanel nomPanel) {
@@ -226,8 +344,9 @@ public class TestJFrame extends JFrame implements ActionListener{
 		return row;		
 	}
 
-	public boolean formulaireOK(JPanel nomPanel) {
+	public boolean formulaireFull(JPanel nomPanel) {
 		boolean isFull = true;
+		int i = 0;
 		for (Component c : nomPanel.getComponents()) {
 			if (c instanceof JPanel) {
 				JPanel p = (JPanel) c;
@@ -252,9 +371,12 @@ public class TestJFrame extends JFrame implements ActionListener{
 			String passwd = "bonjour";
 			conn = DriverManager.getConnection(url, user, passwd);
 			Statement state = conn.createStatement();
-			String sql = "select * from " + nomTable;
+			
+			
+			String sql = "select * from " + nomTable + " order by ref_article";
 			ResultSet result = state.executeQuery(sql);
 			ResultSetMetaData resultMeta = result.getMetaData();
+			
 			
 			int nbCol = resultMeta.getColumnCount();
 			String[] nomDesColonnes = new String[nbCol];
