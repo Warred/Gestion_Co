@@ -15,34 +15,46 @@ import java.sql.ResultSetMetaData;
 import java.sql.Statement;
 import java.util.ArrayList;
 
-import javax.swing.*;
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.JTextField;
 import javax.swing.border.Border;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 
-public class TestJFrame extends JFrame implements ActionListener{
+public class Tiers extends JFrame implements ActionListener{
+
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = 1209646065885814522L;
-	private static int lastIndexArt = -1;
-	JTextField libelle = new JTextField(15);
-	JTextField pxAchat = new JTextField(15);
-	JTextField pxVente = new JTextField(15);
-	JTextField stockTrans = new JTextField(15);
-	JTextField stockDispo = new JTextField(15);
-	JButton addArticle = new JButton("Ajouter");
-	JButton editArticle = new JButton("Modifier");
-	JButton resetArticle = new JButton("Réinitialiser");
-	JTextField recherche;
-	JButton searchArticle;
-	DefaultTableModel modelArt = new DefaultTableModel();
-	JTable jtableArt = new JTable(modelArt);
-	JPanel panelTextArticle = new JPanel();
+	private static final long serialVersionUID = 105249027564442010L;
+
 	
-	public TestJFrame() {
-		setTitle("Articles");
+	private static int lastIndexArt = -1;
+	JTextField nom = new JTextField(15);
+	JTextField prenom = new JTextField(15);
+	JTextField raisonSocial = new JTextField(15);
+	JTextField rue = new JTextField(15);
+	JTextField codePostal = new JTextField(15);
+	JTextField ville = new JTextField(15);
+	JButton addTiers = new JButton("Ajouter");
+	JButton editTiers = new JButton("Modifier");
+	JButton resetTiers = new JButton("Réinitialiser");
+	JTextField recherche;
+	JButton searchTiers;
+	DefaultTableModel modelTiers = new DefaultTableModel();
+	JTable jtableTiers = new JTable(modelTiers);
+	JPanel panelTextTiers = new JPanel();
+	
+	public Tiers() {
+		setTitle("Tiers");
  	    setBounds(100,100,1000,500); 
 	    
  	    JPanel panelFond = new JPanel();//Un panel est un espace dans lequel on peut placer des composants graphiques
@@ -51,14 +63,15 @@ public class TestJFrame extends JFrame implements ActionListener{
  	    JPanel panelHaut = new JPanel();
  	    panelHaut.setLayout(new GridLayout(1,4)); 	    
  	    JPanel panelLabel = new JPanel();
- 	    panelLabel.setLayout(new GridLayout(7,1));    
+ 	    panelLabel.setLayout(new GridLayout(8,1));    
  	    
  	    JLabel videLabel = new JLabel("");
- 		JLabel label_lib_article = new JLabel("Libellé :");
- 		JLabel label_px_achat = new JLabel("Prix d'achat :");
- 		JLabel label_px_vente = new JLabel("Prix de vente :");
- 		JLabel label_stock_transitionnel = new JLabel("Stock transitionnel :");
- 		JLabel label_stock_dispo = new JLabel("Stock disponible :");
+ 		JLabel label_nom = new JLabel("Nom :");
+ 		JLabel label_prenom = new JLabel("Prénom :");
+ 		JLabel label_raison_social = new JLabel("Raison social :");
+ 		JLabel label_rue = new JLabel("Rue :");
+ 		JLabel label_code = new JLabel("Code postal :");
+ 		JLabel label_ville = new JLabel("Ville :");
  		
  		JPanel align0 = new JPanel();
  		align0.setLayout(new BorderLayout());
@@ -66,47 +79,54 @@ public class TestJFrame extends JFrame implements ActionListener{
  		panelLabel.add(align0);
  	    JPanel align1 = new JPanel();
  	    align1.setLayout(new BorderLayout());
- 	    align1.add(label_lib_article, BorderLayout.EAST);
+ 	    align1.add(label_nom, BorderLayout.EAST);
  	    panelLabel.add(align1); 	    
  	    JPanel align2 = new JPanel();
 	    align2.setLayout(new BorderLayout());
-	    align2.add(label_px_achat, BorderLayout.EAST);
+	    align2.add(label_prenom, BorderLayout.EAST);
 	    panelLabel.add(align2); 	    
 	    JPanel align3 = new JPanel();
  	    align3.setLayout(new BorderLayout());
- 	    align3.add(label_px_vente, BorderLayout.EAST);
+ 	    align3.add(label_raison_social, BorderLayout.EAST);
  	    panelLabel.add(align3); 	    
  	    JPanel align4 = new JPanel();
 	    align4.setLayout(new BorderLayout());
-	    align4.add(label_stock_transitionnel, BorderLayout.EAST);
+	    align4.add(label_rue, BorderLayout.EAST);
 	    panelLabel.add(align4);	    
 	    JPanel align5 = new JPanel();
 	    align5.setLayout(new BorderLayout());
-	    align5.add(label_stock_dispo, BorderLayout.EAST);
+	    align5.add(label_code, BorderLayout.EAST);
 	    panelLabel.add(align5);
+	    JPanel align6 = new JPanel();
+	    align6.setLayout(new BorderLayout());
+	    align6.add(label_ville, BorderLayout.EAST);
+	    panelLabel.add(align6);
  	     	    
  	    
- 	    panelTextArticle.setLayout(new GridLayout(7,1));
+ 	    panelTextTiers.setLayout(new GridLayout(8,1));
  	    JPanel videTextUp = new JPanel();
  	    JLabel videT1 = new JLabel("");
  	    videTextUp.add(videT1);
- 	    panelTextArticle.add(videTextUp);
+ 	    panelTextTiers.add(videTextUp);
  	    	    
  	    JPanel txt1 = new JPanel();
- 	    txt1.add(libelle);
- 	    panelTextArticle.add(txt1); 	    
+ 	    txt1.add(nom);
+ 	    panelTextTiers.add(txt1); 	    
  	    JPanel txt2 = new JPanel();
-	    txt2.add(pxAchat);
-	    panelTextArticle.add(txt2);	    
+	    txt2.add(prenom);
+	    panelTextTiers.add(txt2);	    
 	    JPanel txt3 = new JPanel();
- 	    txt3.add(pxVente);
- 	    panelTextArticle.add(txt3); 	    
+ 	    txt3.add(raisonSocial);
+ 	    panelTextTiers.add(txt3); 	    
  	    JPanel txt4 = new JPanel();
-	    txt4.add(stockTrans);
-	    panelTextArticle.add(txt4);	    
+	    txt4.add(rue);
+	    panelTextTiers.add(txt4);	    
 	    JPanel txt5 = new JPanel();
-	    txt5.add(stockDispo);
-	    panelTextArticle.add(txt5);
+	    txt5.add(codePostal);
+	    panelTextTiers.add(txt5);
+	    JPanel txt6 = new JPanel();
+	    txt6.add(ville);
+	    panelTextTiers.add(txt6);
  	    
  	    JPanel panelButton = new JPanel();
 	    panelButton.setLayout(new GridLayout(4,1));
@@ -114,10 +134,10 @@ public class TestJFrame extends JFrame implements ActionListener{
 	    JPanel vide3 = new JPanel();
 	    panelButton.add(vide3);
 	    JPanel but1 = new JPanel();
-	    but1.add(addArticle);
+	    but1.add(addTiers);
 	    panelButton.add(but1);	    
 	    JPanel but2 = new JPanel();
-	    but2.add(editArticle);
+	    but2.add(editTiers);
 	    panelButton.add(but2);
 	    JPanel vide4 = new JPanel();
 	    panelButton.add(vide4);
@@ -134,7 +154,7 @@ public class TestJFrame extends JFrame implements ActionListener{
 	    c.gridy = 0;
 	    panelDroite.add(videArtUp, c);	
 	    
-	    JLabel search = new JLabel("Rechercher par nom :");
+	    JLabel search = new JLabel("Rechercher :");
 	    c.gridx = 0;
 	    c.gridwidth = 0;
 	    c.gridy = 1;
@@ -145,14 +165,14 @@ public class TestJFrame extends JFrame implements ActionListener{
 	    c.gridy = 2;
 	    panelDroite.add(recherche, c);
 	    
-	    searchArticle = new JButton("Rechercher");
+	    searchTiers = new JButton("Rechercher");
 	    c.gridx = 0;
 	    c.gridy = 3;
-	    panelDroite.add(searchArticle, c);
+	    panelDroite.add(searchTiers, c);
 	    
 	    c.gridx = 0;
 	    c.gridy = 4;
-	    panelDroite.add(resetArticle, c);
+	    panelDroite.add(resetTiers, c);
 	    
 	    JLabel videArtDown1 = new JLabel("");
 	    c.gridx = 0;
@@ -166,12 +186,12 @@ public class TestJFrame extends JFrame implements ActionListener{
    
 	    
 	    panelHaut.add(panelLabel);
-	    panelHaut.add(panelTextArticle);
+	    panelHaut.add(panelTextTiers);
 	    panelHaut.add(panelButton);
 	    panelHaut.add(panelDroite);
-	    modelArt = getModel("article");
-		jtableArt.setModel(modelArt);
-		JScrollPane sp = new JScrollPane(jtableArt);
+	    modelTiers = getModel("tiers");
+		jtableTiers.setModel(modelTiers);
+		JScrollPane sp = new JScrollPane(jtableTiers);
 	    Border bord = BorderFactory.createLineBorder(Color.black, 3);
 	    sp.setBorder(bord);
 	    panelHaut.setBorder(bord);
@@ -180,19 +200,28 @@ public class TestJFrame extends JFrame implements ActionListener{
 	    			
 	    this.add(panelFond);
 	    
-	    addArticle.addActionListener(this);
-	    editArticle.addActionListener(this);
-	    searchArticle.addActionListener(this);
-	    resetArticle.addActionListener(this);
-	    jtableArt.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+	    addTiers.addActionListener(this);
+	    editTiers.addActionListener(this);
+	    searchTiers.addActionListener(this);
+	    resetTiers.addActionListener(this);
+	    jtableTiers.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
 	        public void valueChanged(ListSelectionEvent event) {
-	        	int index = jtableArt.getSelectedRow();
+	        	int index = jtableTiers.getSelectedRow();
+	        	ArrayList<String> valeurs = new ArrayList<String>();
 	            if (index != lastIndexArt && index > -1) {
-	                libelle.setText(jtableArt.getValueAt(index, 1).toString());
-	                pxAchat.setText(jtableArt.getValueAt(index, 2).toString());
-	                pxVente.setText(jtableArt.getValueAt(index, 3).toString());
-	                stockTrans.setText(jtableArt.getValueAt(index, 4).toString());
-	                stockDispo.setText(jtableArt.getValueAt(index, 5).toString());
+	            	for (int i = 1; i < modelTiers.getColumnCount(); i++) {
+	            		if (jtableTiers.getValueAt(index, i) != null) {
+	            			valeurs.add(jtableTiers.getValueAt(index, i).toString());	            			
+	            		} else 	valeurs.add("");            			
+	            	}
+		            
+		            nom.setText(valeurs.get(0));
+		            prenom.setText(valeurs.get(1));
+		            raisonSocial.setText(valeurs.get(2));
+		            rue.setText(valeurs.get(3));
+		            codePostal.setText(valeurs.get(4));
+		            ville.setText(valeurs.get(5));
+		            
 	            }
 	            lastIndexArt = index;
 	        }
@@ -201,61 +230,65 @@ public class TestJFrame extends JFrame implements ActionListener{
 	}
 
 	public static void main(String[] args) {
-		TestJFrame f = new TestJFrame();
+		Tiers f = new Tiers();
 		f.setVisible(true);
 		f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	}
 
 	public void actionPerformed(ActionEvent clic) {			
-		if (clic.getSource() == addArticle) {			
-			if (formulaireFull(panelTextArticle)) {				
-				if(insertSQL("article", recupText(panelTextArticle))) {
-					modelArt = getModel("article");
-					jtableArt.setModel(modelArt);
-					videText(panelTextArticle);
+		if (clic.getSource() == addTiers) {			
+			if (formulaireFull(panelTextTiers)) {				
+				if(insertSQL("tiers", recupText())) {
+					modelTiers = getModel("tiers");
+					jtableTiers.setModel(modelTiers);
+					videText();
 				}
-			} else JOptionPane.showMessageDialog(this, "Remplir tout les renseignements pour ajouter un article");
+			}
 		
-		} else if (clic.getSource() == searchArticle) {
+		} else if (clic.getSource() == searchTiers) {
 			String str = recherche.getText().toLowerCase();
 			if (!str.isEmpty()) {
 				boolean trouve = false;
-				String nomTable = "article where lib_article ilike '%" + str + "%'";
-				String sql = "select * from " + nomTable + " order by ref_article";
+				String nomTable = "tiers where nom ilike '%" + str + "%' OR prenom ilike '%" + str + "%'";
+				nomTable += " OR raison_social ilike '%" + str + "%'";
+				String sql = "select * from " + nomTable + " order by code_tiers";
 				System.out.println(sql);
 				
-				for (int i = 0; i < modelArt.getRowCount(); i++) {
-					if (modelArt.getValueAt(i, 1).toString().toLowerCase().contains(str)) {						
-						jtableArt.changeSelection(i, 0, false, false);
-						trouve = true;
+				for (int i = 0; i < modelTiers.getRowCount(); i++) {
+					for (int j = 1; j <= 3; j++) {
+						if (modelTiers.getValueAt(i, j) != null) {
+							if (modelTiers.getValueAt(i, j).toString().toLowerCase().contains(str)) {
+								trouve = true;
+							}
+						}
 					}
 				}
 				if (trouve) {
 					DefaultTableModel modelRech = getModel(nomTable);
-					jtableArt.setModel(modelRech);
+					jtableTiers.setModel(modelRech);
 				} else{
-					JOptionPane.showMessageDialog(this, "Le nom '" + str +"' n'est pas dans le tableau");
-					jtableArt.setModel(modelArt);
+					JOptionPane.showMessageDialog(this, "Aucun '" + str +"' n'est dans le tableau");
+					jtableTiers.setModel(modelTiers);
 				}
 			} else{
 				JOptionPane.showMessageDialog(this, "Entrer un nom dans la recherche");
-				jtableArt.setModel(modelArt);
-			}
+				jtableTiers.setModel(modelTiers);
+			}			
 			
-			
-		} else if (clic.getSource() == editArticle) {
-			if (jtableArt.getSelectedRow() != -1) {
-				if (formulaireFull(panelTextArticle)) {
-					if(updateSQL("article", recupText(panelTextArticle), jtableArt.getValueAt(jtableArt.getSelectedRow(), 0).toString())) {
-						modelArt = getModel("article");
-						jtableArt.setModel(modelArt);
-						videText(panelTextArticle);
+		} else if (clic.getSource() == editTiers) {
+			if (jtableTiers.getSelectedRow() != -1) {
+				if (formulaireFull(panelTextTiers)) {
+					if(updateSQL("tiers", recupText(), jtableTiers.getValueAt(jtableTiers.getSelectedRow(), 0).toString())) {
+						modelTiers = getModel("tiers");
+						jtableTiers.setModel(modelTiers);
+						videText();
 					}
-				} else JOptionPane.showMessageDialog(this, "Remplir tout les renseignements pour ajouter un article");
-			} else JOptionPane.showMessageDialog(this, "Selectionner un article à modifier dans le JTable");
-		} else if (clic.getSource() == resetArticle) {
-			modelArt = getModel("article");
-			jtableArt.setModel(modelArt);	
+				} else JOptionPane.showMessageDialog(this, "Remplir tout les renseignements pour ajouter un tiers");
+			} else JOptionPane.showMessageDialog(this, "Selectionner un tiers à modifier dans le JTable");
+			
+		} else if (clic.getSource() == resetTiers) {
+			modelTiers = getModel("tiers");
+			jtableTiers.setModel(modelTiers);	
 		}else JOptionPane.showMessageDialog(this, "Pas encore codé cette fonction");		
 	}
 		
@@ -283,10 +316,10 @@ public class TestJFrame extends JFrame implements ActionListener{
 	}
 
 	private boolean updateSQL(String nomTable, ArrayList<String> valeurs, String serial) {
-		String sql = "UPDATE " + nomTable + " SET  lib_article = '" + valeurs.get(0) + "', px_achat = '" + valeurs.get(1);
-		sql += "', px_vente = '" + valeurs.get(2) + "', stock_transitionnel = '" + valeurs.get(3);
-		sql += "', stock_dispo = '" + valeurs.get(4) + "' ";
-		sql += "WHERE ref_article = " + serial;
+		String sql = "UPDATE " + nomTable + " SET  nom = '" + valeurs.get(0) + "', prenom = '" + valeurs.get(1);
+		sql += "', raison_social = '" + valeurs.get(2) + "', rue = '" + valeurs.get(3);
+		sql += "', cp = '" + valeurs.get(4) + "', ville = '" + valeurs.get(5) + "' ";
+		sql += "WHERE code_tiers = " + serial;
 
 		System.out.println(sql);
 		Connection conn = null;
@@ -307,8 +340,8 @@ public class TestJFrame extends JFrame implements ActionListener{
 		return true;
 	}
 
-	private void videText(JPanel nomPanel) {
-		for (Component c : nomPanel.getComponents()) {
+	private void videText() {
+		for (Component c : panelTextTiers.getComponents()) {
 			if (c instanceof JPanel) {
 				JPanel p = (JPanel) c;
 				for (Component txt : p.getComponents()) {
@@ -321,36 +354,30 @@ public class TestJFrame extends JFrame implements ActionListener{
 		}		
 	}
 
-	private ArrayList<String> recupText(JPanel nomPanel) {
+	private ArrayList<String> recupText() {
 		ArrayList<String> row = new ArrayList<String>();
-		for (Component c : nomPanel.getComponents()) {
+		for (Component c : panelTextTiers.getComponents()) {
 			if (c instanceof JPanel) {
 				JPanel p = (JPanel) c;
 				for (Component txt : p.getComponents()) {
 					if (txt instanceof JTextField) {
 						JTextField t = (JTextField) txt;
-						row.add(t.getText());						
+						if (t.getText().isEmpty()) row.add("");
+						else row.add(t.getText());						
 					}
 				}
 			}			
 		}		
-		return row;		
+		return row;
 	}
 
 	public boolean formulaireFull(JPanel nomPanel) {
-		boolean isFull = true;
-		for (Component c : nomPanel.getComponents()) {
-			if (c instanceof JPanel) {
-				JPanel p = (JPanel) c;
-				for (Component txt : p.getComponents()) {
-					if (txt instanceof JTextField) {
-						JTextField t = (JTextField) txt;						
-						if (t.getText().isEmpty()) isFull = false;
-					}
-				}
-			}			
-		}
-		return isFull;
+		if ( (!nom.getText().isEmpty() && !prenom.getText().isEmpty() ) || !raisonSocial.getText().isEmpty() ) {
+			if (!ville.getText().isEmpty() && !codePostal.getText().isEmpty() && !rue.getText().isEmpty()) {
+				return true;
+			} else JOptionPane.showMessageDialog(this, "Remplir tout les renseignements pour ajouter un tiers");
+		} else JOptionPane.showMessageDialog(this, "Remplir nom/prénom ou raison social pour ajouter un tiers");
+		return false;
 	}
 	
 	public DefaultTableModel getModel(String nomTable) {
@@ -365,7 +392,7 @@ public class TestJFrame extends JFrame implements ActionListener{
 			Statement state = conn.createStatement();
 			
 			
-			String sql = "select * from " + nomTable + " order by ref_article";
+			String sql = "select * from " + nomTable + " order by code_tiers";
 			ResultSet result = state.executeQuery(sql);
 			ResultSetMetaData resultMeta = result.getMetaData();
 			
@@ -397,6 +424,6 @@ public class TestJFrame extends JFrame implements ActionListener{
 			JOptionPane.showMessageDialog(this, e.getMessage());
 		}
 		return modelTmp;
-	}	
+	}
 
 }
