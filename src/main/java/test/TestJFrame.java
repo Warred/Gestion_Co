@@ -37,9 +37,9 @@ public class TestJFrame extends JFrame implements ActionListener{
 	JTextField stockDispo = new JTextField(15);
 	JButton addArticle = new JButton("Ajouter");
 	JButton editArticle = new JButton("Modifier");
-	JButton searchArticle = new JButton("Rechercher");
+	JButton resetArticle = new JButton("Réinitialiser");
 	JTextField recherche;
-	JButton buttonOK;
+	JButton searchArticle;
 	DefaultTableModel modelArt = new DefaultTableModel();
 	JTable jtableArt = new JTable(modelArt);
 	JPanel panelTextArticle = new JPanel();
@@ -62,13 +62,18 @@ public class TestJFrame extends JFrame implements ActionListener{
  	    panelHaut.setLayout(new GridLayout(1,4)); 	    
  	    JPanel panelLabel = new JPanel();
  	    panelLabel.setLayout(new GridLayout(7,1));    
-
+ 	    
+ 	    JLabel videLabel = new JLabel("");
  		JLabel label_lib_article = new JLabel("Libellé :");
  		JLabel label_px_achat = new JLabel("Prix d'achat :");
  		JLabel label_px_vente = new JLabel("Prix de vente :");
  		JLabel label_stock_transitionnel = new JLabel("Stock transitionnel :");
  		JLabel label_stock_dispo = new JLabel("Stock disponible :");
  		
+ 		JPanel align0 = new JPanel();
+ 		align0.setLayout(new BorderLayout());
+ 		align0.add(videLabel, BorderLayout.EAST);
+ 		panelLabel.add(align0);
  	    JPanel align1 = new JPanel();
  	    align1.setLayout(new BorderLayout());
  	    align1.add(label_lib_article, BorderLayout.EAST);
@@ -92,6 +97,10 @@ public class TestJFrame extends JFrame implements ActionListener{
  	     	    
  	    
  	    panelTextArticle.setLayout(new GridLayout(7,1));
+ 	    JPanel videTextUp = new JPanel();
+ 	    JLabel videT1 = new JLabel("");
+ 	    videTextUp.add(videT1);
+ 	    panelTextArticle.add(videTextUp);
  	    	    
  	    JPanel txt1 = new JPanel();
  	    txt1.add(libelle);
@@ -130,6 +139,11 @@ public class TestJFrame extends JFrame implements ActionListener{
 	    c.weighty = 0.2;
 	    c.fill = GridBagConstraints.NONE;
 	    
+	    JLabel videArtUp = new JLabel("");
+	    c.gridx = 0;
+	    c.gridy = 0;
+	    panelDroite.add(videArtUp, c);	
+	    
 	    JLabel search = new JLabel("Rechercher par nom :");
 	    c.gridx = 0;
 	    c.gridwidth = 0;
@@ -141,14 +155,25 @@ public class TestJFrame extends JFrame implements ActionListener{
 	    c.gridy = 2;
 	    panelDroite.add(recherche, c);
 	    
-	    buttonOK = new JButton("Ok");
+	    searchArticle = new JButton("Rechercher");
 	    c.gridx = 0;
 	    c.gridy = 3;
-	    panelDroite.add(buttonOK, c);
-//	    JLabel vide5 = new JLabel("");
-//	    c.gridx = 0;
-//	    c.gridy = 5;
-//	    panelDroite.add(vide5, c);	    
+	    panelDroite.add(searchArticle, c);
+	    
+	    c.gridx = 0;
+	    c.gridy = 4;
+	    panelDroite.add(resetArticle, c);
+	    
+	    JLabel videArtDown1 = new JLabel("");
+	    c.gridx = 0;
+	    c.gridy = 5;
+	    panelDroite.add(videArtDown1, c);
+	    
+	    JLabel videArtDown2 = new JLabel("");
+	    c.gridx = 0;
+	    c.gridy = 6;
+	    panelDroite.add(videArtDown2, c);
+   
 	    
 	    panelHaut.add(panelLabel);
 	    panelHaut.add(panelTextArticle);
@@ -173,7 +198,8 @@ public class TestJFrame extends JFrame implements ActionListener{
 	    
 	    addArticle.addActionListener(this);
 	    editArticle.addActionListener(this);
-	    buttonOK.addActionListener(this);
+	    searchArticle.addActionListener(this);
+	    resetArticle.addActionListener(this);
 	    jtableArt.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
 	        public void valueChanged(ListSelectionEvent event) {
 	        	int index = jtableArt.getSelectedRow();
@@ -206,9 +232,8 @@ public class TestJFrame extends JFrame implements ActionListener{
 				}
 			} else JOptionPane.showMessageDialog(this, "Remplir tout les renseignements pour ajouter un article");
 		
-		} else if (clic.getSource() == buttonOK) {
+		} else if (clic.getSource() == searchArticle) {
 			String str = recherche.getText().toLowerCase();
-			System.out.println(str);
 			if (!str.isEmpty()) {
 				boolean trouve = false;
 				String nomTable = "article where lib_article ilike '%" + str + "%'";
@@ -244,8 +269,10 @@ public class TestJFrame extends JFrame implements ActionListener{
 					}
 				} else JOptionPane.showMessageDialog(this, "Remplir tout les renseignements pour ajouter un article");
 			} else JOptionPane.showMessageDialog(this, "Selectionner un article à modifier dans le JTable");
-		}else JOptionPane.showMessageDialog(this, "Pas encore codé cette fonction");
-		
+		} else if (clic.getSource() == resetArticle) {
+			modelArt = getModel("article");
+			jtableArt.setModel(modelArt);	
+		}else JOptionPane.showMessageDialog(this, "Pas encore codé cette fonction");		
 	}
 		
 	private boolean insertSQL(String nomTable, ArrayList<String> valeurs) {
