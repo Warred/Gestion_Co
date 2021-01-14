@@ -1,4 +1,4 @@
-package test;
+package gestion_co;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -15,17 +15,26 @@ import java.sql.ResultSetMetaData;
 import java.sql.Statement;
 import java.util.ArrayList;
 
-import javax.swing.*;
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.JTextField;
 import javax.swing.border.Border;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 
-public class TestJFrame extends JFrame implements ActionListener{
+public class Article extends JFrame implements ActionListener {
+
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = 1209646065885814522L;
+	private static final long serialVersionUID = 1L;
 	private static int lastIndexArt = -1;
 	JTextField libelle = new JTextField(15);
 	JTextField pxAchat = new JTextField(15);
@@ -41,10 +50,10 @@ public class TestJFrame extends JFrame implements ActionListener{
 	JTable jtableArt = new JTable(modelArt);
 	JPanel panelTextArticle = new JPanel();
 	
-	public TestJFrame() {
-		setTitle("Articles");
+	public Article() {
+		setTitle("Gestion Commerciale V1");
  	    setBounds(100,100,1000,500); 
-	    
+
  	    JPanel panelFond = new JPanel();//Un panel est un espace dans lequel on peut placer des composants graphiques
  	    panelFond.setLayout(new GridLayout(2, 1));
  	    
@@ -169,12 +178,14 @@ public class TestJFrame extends JFrame implements ActionListener{
 	    panelHaut.add(panelTextArticle);
 	    panelHaut.add(panelButton);
 	    panelHaut.add(panelDroite);
+	    
 	    modelArt = getModel("article");
 		jtableArt.setModel(modelArt);
 		JScrollPane sp = new JScrollPane(jtableArt);
+		
 	    Border bord = BorderFactory.createLineBorder(Color.black, 3);
 	    sp.setBorder(bord);
-	    panelHaut.setBorder(bord);
+	    
 	    panelFond.add(panelHaut);
 	    panelFond.add(sp);	    
 	    			
@@ -197,16 +208,10 @@ public class TestJFrame extends JFrame implements ActionListener{
 	            lastIndexArt = index;
 	        }
 	    });
-	    
-	}
+	}	    
 
-	public static void main(String[] args) {
-		TestJFrame f = new TestJFrame();
-		f.setVisible(true);
-		f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-	}
-
-	public void actionPerformed(ActionEvent clic) {			
+	public void actionPerformed(ActionEvent clic) {
+		// TODO Auto-generated method stub
 		if (clic.getSource() == addArticle) {			
 			if (formulaireFull(panelTextArticle)) {				
 				if(insertSQL("article", recupText(panelTextArticle))) {
@@ -240,8 +245,7 @@ public class TestJFrame extends JFrame implements ActionListener{
 			} else{
 				JOptionPane.showMessageDialog(this, "Entrer un nom dans la recherche");
 				jtableArt.setModel(modelArt);
-			}
-			
+			}			
 			
 		} else if (clic.getSource() == editArticle) {
 			if (jtableArt.getSelectedRow() != -1) {
@@ -256,9 +260,9 @@ public class TestJFrame extends JFrame implements ActionListener{
 		} else if (clic.getSource() == resetArticle) {
 			modelArt = getModel("article");
 			jtableArt.setModel(modelArt);	
-		}else JOptionPane.showMessageDialog(this, "Pas encore codé cette fonction");		
+		}
 	}
-		
+	
 	private boolean insertSQL(String nomTable, ArrayList<String> valeurs) {
 		String sql = "INSERT INTO " + nomTable + " VALUES (default";
 		for (String val : valeurs) sql += ",'" + val +"'";
@@ -350,7 +354,7 @@ public class TestJFrame extends JFrame implements ActionListener{
 				}
 			}			
 		}
-		return isFull;
+		return isFull;		
 	}
 	
 	public DefaultTableModel getModel(String nomTable) {
@@ -362,13 +366,11 @@ public class TestJFrame extends JFrame implements ActionListener{
 			String user = "postgres";
 			String passwd = "bonjour";
 			conn = DriverManager.getConnection(url, user, passwd);
-			Statement state = conn.createStatement();
-			
+			Statement state = conn.createStatement();			
 			
 			String sql = "select * from " + nomTable + " order by ref_article";
 			ResultSet result = state.executeQuery(sql);
-			ResultSetMetaData resultMeta = result.getMetaData();
-			
+			ResultSetMetaData resultMeta = result.getMetaData();			
 			
 			int nbCol = resultMeta.getColumnCount();
 			String[] nomDesColonnes = new String[nbCol];
@@ -384,19 +386,16 @@ public class TestJFrame extends JFrame implements ActionListener{
 				
 				for (int i = 1; i <= nbCol; i++) {
 					result.getObject(i);
-					if (!result.wasNull()) {
-						
+					if (!result.wasNull()) {						
 						row[i-1] = result.getObject(i).toString();
 					}
 				}
 				modelTmp.addRow(row);
-			}
-				
+			}				
 		} catch (Exception e) {
 			e.printStackTrace();
 			JOptionPane.showMessageDialog(this, e.getMessage());
 		}
 		return modelTmp;
-	}	
-
+	}
 }

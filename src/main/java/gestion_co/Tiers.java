@@ -1,4 +1,4 @@
-package test;
+package gestion_co;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
