@@ -2,6 +2,7 @@ package gestion_co;
 import java.awt.BorderLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -13,6 +14,9 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+
+import javax.swing.ComboBoxModel;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
@@ -22,15 +26,18 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.event.ListDataListener;
+import javax.swing.event.TableModelEvent;
 import javax.swing.table.DefaultTableModel;
 import static javax.swing.JOptionPane.*;
 
 public class gestion_commande {
 	JTextField zone_texte1;
-	JTable table, table2;
-	static DefaultTableModel model;
+	static JTable table = new JTable();
+	static DefaultTableModel model = new DefaultTableModel();
 	DefaultTableModel model2;
-	JButton bouton_afficher_commande, bouton_creer_commnde, bouton_supprimer_commande, bouton_valider_recherche;
+	JButton bouton_afficher_commande, bouton_creer_commnde, bouton_supprimer_commande,
+	bouton_valider_recherche, bouton_afficher_article, bouton_afficher_tiers;
 	static  int num_ligne = 0;
 	static  String num_cde = "";
 	static String date_cde ="";
@@ -49,12 +56,12 @@ public class gestion_commande {
 	int recherche_id_pdt;
 	static String passwd;
 
-	JComboBox choix_article = new JComboBox();
+	static JComboBox choix_article = new JComboBox();
 	JComboBox choix_type_cde = new JComboBox();
-	JComboBox choix_tiers = new JComboBox();
+	static JComboBox choix_tiers = new JComboBox();
 	JComboBox choix_statut_cde = new JComboBox();
-	ArrayList<Object> article = new ArrayList<Object>();
-	ArrayList<Object> tiers = new ArrayList<Object>();
+	static ArrayList<Object> article = new ArrayList<Object>();
+	static ArrayList<Object> tiers = new ArrayList<Object>();
 	ArrayList<Object> type_de_cde = new ArrayList<Object>();
 	ArrayList<Object> statut_de_cde = new ArrayList<Object>();
 	JLabel filtre1 = new JLabel("Filtre Produits");
@@ -70,27 +77,28 @@ public class gestion_commande {
 	public gestion_commande() {
 		JFrame f = new JFrame("Gestion des commandes");
 		JPanel panel1 = new JPanel();
+		JPanel pan_haut = new JPanel();
+		JPanel panel_menu = new JPanel();
 		passwd = (String) JOptionPane.showInputDialog(f, "Entrez votre mot de passe");
-
-		model = new DefaultTableModel();
-	    table = new JTable(model);
-
+		connection();
+		afficher_table();
+		combo_statut_cde();
+		combo_type_cde();
+		combo_choix_tiers();
+		combo_choix_article();
 	    
 	    bouton_afficher_commande =new JButton("Afficher commande");
 	    bouton_creer_commnde =new JButton("Créer commande");
 	    bouton_supprimer_commande =new JButton("Supprimer commande");
 		bouton_valider_recherche =new JButton("Valider recherche");
-
+		bouton_afficher_article = new JButton("Menu articles");
+		bouton_afficher_tiers = new JButton("Menu tiers");
+		
 		panel1.setLayout(new GridBagLayout());
 		GridBagConstraints gc2 = new GridBagConstraints();
 		gc2.weightx = 4;
-		gc2.weighty = 4;
+		gc2.weighty = 6;
 		gc2.insets = new Insets(5, 5, 5, 5);
-		combo_statut_cde();
-		combo_type_cde();
-		combo_choix_tiers();
-		combo_choix_article();
-
 		
 		gc2.gridx = 0;
 		gc2.gridy = 0;
@@ -116,9 +124,7 @@ public class gestion_commande {
 		panel1.add(choix_type_cde, gc2);
 		gc2.gridx = 3;
 		gc2.gridy = 1;
-		panel1.add(choix_statut_cde, gc2);
-		
-		
+		panel1.add(choix_statut_cde, gc2);		
 		
 		gc2.gridx = 1;
 		gc2.gridy = 2;
@@ -126,24 +132,51 @@ public class gestion_commande {
 		
 		gc2.gridx = 0;
 		gc2.gridy = 3;
-		panel1.add(bouton_afficher_commande, gc2);
+		panel1.add(new JLabel(""), gc2);
+		gc2.gridx = 0;
+		gc2.gridy = 4;
+		panel1.add(new JLabel(""), gc2);
+		gc2.gridx = 0 ;
+		gc2.gridy = 5;
+		panel1.add(new JLabel(""), gc2);
+		
 		gc2.gridx = 1;
-		gc2.gridy = 3;
-		panel1.add(bouton_creer_commnde, gc2);
+		gc2.gridy = 6;
+		panel1.add(bouton_afficher_commande, gc2);
 		gc2.gridx = 2;
-		gc2.gridy = 3;
+		gc2.gridy = 6;
 		panel1.add(bouton_supprimer_commande, gc2);
 		
-		f.setLayout(new BorderLayout());
-		f.getContentPane().add(panel1, BorderLayout.NORTH);
-		f.getContentPane().add(new JScrollPane(table), BorderLayout.SOUTH);
+		panel_menu.add(bouton_creer_commnde);
+		panel_menu.add(bouton_afficher_article);
+		panel_menu.add(bouton_afficher_tiers);
+		
+		pan_haut.setLayout(new BorderLayout());
+		pan_haut.add(panel1, BorderLayout.SOUTH);
+
+		pan_haut.add(panel_menu, BorderLayout.NORTH);
+		f.setLayout(new GridLayout(2,1));
+		f.getContentPane().add(pan_haut);
+		f.getContentPane().add(new JScrollPane(table));
 
 		/* Définition de la fenêtre */
 		f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		f.setSize(1000, 800);
+		f.setSize(1000, 600);
 		f.setResizable(false);
 		f.setLocationRelativeTo(null);
 		f.setVisible(true);
+		
+		bouton_afficher_tiers.addActionListener(new ActionListener() {			
+			public void actionPerformed(ActionEvent e) {
+				Tiers t1 = new Tiers();				
+			}
+		});
+		
+		bouton_afficher_article.addActionListener(new ActionListener() {			
+			public void actionPerformed(ActionEvent e) {
+				Article a1 = new Article();				
+			}
+		});
 		
 		bouton_afficher_commande.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
@@ -271,7 +304,6 @@ public class gestion_commande {
 		Class.forName("org.postgresql.Driver");
 		String url = "jdbc:postgresql://localhost:5432/base_gestion_co?currentSchema=schema_gestion_co";
 		String user = "postgres";
-		//String passwd = "Maelys06.";
 		conn = DriverManager.getConnection(url, user, passwd);
 		
 		} catch (Exception e) {
@@ -325,7 +357,6 @@ public class gestion_commande {
 	}
 	
 	public static void afficher_table() {
-		connection();
 		try {
 		Statement state = conn.createStatement();
 		String sql = ("select ref_commande as \"N° de commande\", date_commande as \"Date\",");
@@ -335,10 +366,10 @@ public class gestion_commande {
 		
 		ResultSet result = state.executeQuery(sql);
 		ResultSetMetaData resultMeta = result.getMetaData();
-
+		DefaultTableModel tmp = new DefaultTableModel();
 		// les entetes du tableau
 		for (int i = 1; i <= resultMeta.getColumnCount(); i++) {
-			model.addColumn(resultMeta.getColumnName(i).toUpperCase());
+			tmp.addColumn(resultMeta.getColumnName(i).toUpperCase());
 		}
 		//les donnees du tableau
 		while (result.next()) {
@@ -346,8 +377,11 @@ public class gestion_commande {
 			for (int i=1; i <=resultMeta.getColumnCount(); i++) {
 				o.add(result.getString(i));    
 			}
-			model.insertRow(model.getRowCount(), o.toArray());
+			tmp.insertRow(tmp.getRowCount(), o.toArray());
 		}
+		model = tmp;
+		table.setModel(model);
+		
 		result.close();
 		state.close();
 		} catch (Exception e) {
@@ -374,25 +408,28 @@ public class gestion_commande {
 	}
 	
 	@SuppressWarnings("unchecked")
-	public void combo_choix_tiers () {
-		gestion_commande.connection();
+	public static void combo_choix_tiers () {
 		try {
 		Statement state = gestion_commande.conn.createStatement();
-		String req = ("select code_tiers, nom, prenom, raison_social from tiers;");
+		String req = ("select code_tiers, nom, prenom, raison_social from tiers order by code_tiers;");
 		ResultSet result = state.executeQuery(req);
 		ResultSetMetaData resultMeta = result.getMetaData();
+		tiers.clear();
 		tiers.add("");
 		while (result.next()) {
 			String nom ="";
 			for (int i=1; i <=resultMeta.getColumnCount(); i++) {
-				if (result.getString(i)!= null) {
+				if (result.getString(i)!= null && !result.getString(i).equals("")) {
 					nom = nom+" "+result.getString(i);
 				}
 				
 			}	tiers.add(nom);			
 		}
-		choix_tiers = new JComboBox(tiers.toArray());
+		
+		DefaultComboBoxModel test = new DefaultComboBoxModel(tiers.toArray());
+		choix_tiers.setModel(test);
 		choix_tiers.setSelectedIndex(0);
+		
 		result.close();
 		state.close();
 		} catch (Exception e) {
@@ -401,24 +438,25 @@ public class gestion_commande {
 	}
 	
 	@SuppressWarnings("unchecked")
-	public void combo_choix_article () {
-		gestion_commande.connection();
+	public static void combo_choix_article () {
 		try {
 		Statement state = gestion_commande.conn.createStatement();
 		String req = ("select ref_article, lib_article from article;");
 		ResultSet result = state.executeQuery(req);
 		ResultSetMetaData resultMeta = result.getMetaData();
+		article.clear();
 		article.add("");
 		while (result.next()) {
 			String produits ="";
 			for (int i=1; i <=resultMeta.getColumnCount(); i++) {
-				if (result.getString(i)!= null) {
+				if (result.getString(i)!= null && !result.getString(i).equals("")) {
 					produits = produits+" "+result.getString(i);
 				}
 				
 			}	article.add(produits);			
 		}
-		choix_article = new JComboBox(article.toArray());
+		DefaultComboBoxModel test = new DefaultComboBoxModel(article.toArray());
+		choix_article.setModel(test);
 		choix_article.setSelectedIndex(0);
 		result.close();
 		state.close();
@@ -431,6 +469,5 @@ public class gestion_commande {
 	
 	public static void main(String[] args) {
 		  gestion_commande g = new gestion_commande();
-		  g.afficher_table();
 	}
 }

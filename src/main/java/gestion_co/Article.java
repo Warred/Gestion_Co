@@ -12,6 +12,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 
@@ -39,7 +40,6 @@ public class Article extends JFrame implements ActionListener {
 	JTextField libelle = new JTextField(15);
 	JTextField pxAchat = new JTextField(15);
 	JTextField pxVente = new JTextField(15);
-	JTextField stockTrans = new JTextField(15);
 	JTextField stockDispo = new JTextField(15);
 	JButton addArticle = new JButton("Ajouter");
 	JButton editArticle = new JButton("Modifier");
@@ -51,8 +51,9 @@ public class Article extends JFrame implements ActionListener {
 	JPanel panelTextArticle = new JPanel();
 	
 	public Article() {
-		setTitle("Gestion Commerciale V1");
- 	    setBounds(100,100,1000,500); 
+		JFrame f = new JFrame("Articles");
+		f.setSize(1000, 500);
+		
 
  	    JPanel panelFond = new JPanel();//Un panel est un espace dans lequel on peut placer des composants graphiques
  	    panelFond.setLayout(new GridLayout(2, 1));
@@ -63,12 +64,16 @@ public class Article extends JFrame implements ActionListener {
  	    panelLabel.setLayout(new GridLayout(7,1));    
  	    
  	    JLabel videLabel = new JLabel("");
+ 		JLabel videlabel2 = new JLabel("");
  		JLabel label_lib_article = new JLabel("Libellé :");
  		JLabel label_px_achat = new JLabel("Prix d'achat :");
  		JLabel label_px_vente = new JLabel("Prix de vente :");
- 		JLabel label_stock_transitionnel = new JLabel("Stock transitionnel :");
  		JLabel label_stock_dispo = new JLabel("Stock disponible :");
  		
+	    JPanel align = new JPanel();
+	    align.setLayout(new BorderLayout());
+	    align.add(videlabel2, BorderLayout.EAST);
+	    panelLabel.add(align);
  		JPanel align0 = new JPanel();
  		align0.setLayout(new BorderLayout());
  		align0.add(videLabel, BorderLayout.EAST);
@@ -87,20 +92,18 @@ public class Article extends JFrame implements ActionListener {
  	    panelLabel.add(align3); 	    
  	    JPanel align4 = new JPanel();
 	    align4.setLayout(new BorderLayout());
-	    align4.add(label_stock_transitionnel, BorderLayout.EAST);
-	    panelLabel.add(align4);	    
-	    JPanel align5 = new JPanel();
-	    align5.setLayout(new BorderLayout());
-	    align5.add(label_stock_dispo, BorderLayout.EAST);
-	    panelLabel.add(align5);
- 	     	    
+	    align4.add(label_stock_dispo, BorderLayout.EAST);
+	    panelLabel.add(align4); 	     	    
  	    
  	    panelTextArticle.setLayout(new GridLayout(7,1));
  	    JPanel videTextUp = new JPanel();
  	    JLabel videT1 = new JLabel("");
  	    videTextUp.add(videT1);
  	    panelTextArticle.add(videTextUp);
- 	    	    
+ 	    
+ 	    JPanel txt = new JPanel();
+	    txt.add(new JLabel(""));
+	    panelTextArticle.add(txt);
  	    JPanel txt1 = new JPanel();
  	    txt1.add(libelle);
  	    panelTextArticle.add(txt1); 	    
@@ -109,13 +112,10 @@ public class Article extends JFrame implements ActionListener {
 	    panelTextArticle.add(txt2);	    
 	    JPanel txt3 = new JPanel();
  	    txt3.add(pxVente);
- 	    panelTextArticle.add(txt3); 	    
- 	    JPanel txt4 = new JPanel();
-	    txt4.add(stockTrans);
-	    panelTextArticle.add(txt4);	    
-	    JPanel txt5 = new JPanel();
-	    txt5.add(stockDispo);
-	    panelTextArticle.add(txt5);
+ 	    panelTextArticle.add(txt3); 	    	    
+	    JPanel txt4 = new JPanel();
+	    txt4.add(stockDispo);
+	    panelTextArticle.add(txt4);
  	    
  	    JPanel panelButton = new JPanel();
 	    panelButton.setLayout(new GridLayout(4,1));
@@ -188,8 +188,11 @@ public class Article extends JFrame implements ActionListener {
 	    
 	    panelFond.add(panelHaut);
 	    panelFond.add(sp);	    
-	    			
-	    this.add(panelFond);
+	    
+	    f.setResizable(false);
+		f.setLocationRelativeTo(null);
+		f.setVisible(true);
+	    f.add(panelFond);
 	    
 	    addArticle.addActionListener(this);
 	    editArticle.addActionListener(this);
@@ -202,7 +205,6 @@ public class Article extends JFrame implements ActionListener {
 	                libelle.setText(jtableArt.getValueAt(index, 1).toString());
 	                pxAchat.setText(jtableArt.getValueAt(index, 2).toString());
 	                pxVente.setText(jtableArt.getValueAt(index, 3).toString());
-	                stockTrans.setText(jtableArt.getValueAt(index, 4).toString());
 	                stockDispo.setText(jtableArt.getValueAt(index, 5).toString());
 	            }
 	            lastIndexArt = index;
@@ -218,6 +220,7 @@ public class Article extends JFrame implements ActionListener {
 					modelArt = getModel("article");
 					jtableArt.setModel(modelArt);
 					videText(panelTextArticle);
+					gestion_commande.combo_choix_article();
 				}
 			} else JOptionPane.showMessageDialog(this, "Remplir tout les renseignements pour ajouter un article");
 		
@@ -226,12 +229,9 @@ public class Article extends JFrame implements ActionListener {
 			if (!str.isEmpty()) {
 				boolean trouve = false;
 				String nomTable = "article where lib_article ilike '%" + str + "%'";
-				String sql = "select * from " + nomTable + " order by ref_article";
-				System.out.println(sql);
-				
+								
 				for (int i = 0; i < modelArt.getRowCount(); i++) {
-					if (modelArt.getValueAt(i, 1).toString().toLowerCase().contains(str)) {						
-						jtableArt.changeSelection(i, 0, false, false);
+					if (modelArt.getValueAt(i, 1).toString().toLowerCase().contains(str)) {
 						trouve = true;
 					}
 				}
@@ -254,6 +254,7 @@ public class Article extends JFrame implements ActionListener {
 						modelArt = getModel("article");
 						jtableArt.setModel(modelArt);
 						videText(panelTextArticle);
+						gestion_commande.combo_choix_article();
 					}
 				} else JOptionPane.showMessageDialog(this, "Remplir tout les renseignements pour ajouter un article");
 			} else JOptionPane.showMessageDialog(this, "Selectionner un article à modifier dans le JTable");
@@ -268,14 +269,8 @@ public class Article extends JFrame implements ActionListener {
 		for (String val : valeurs) sql += ",'" + val +"'";
 		sql += ");";
 		System.out.println(sql);
-		Connection conn = null;
 		try {
-			Class.forName("org.postgresql.Driver");
-			String url = "jdbc:postgresql://localhost:5432/base_gestion_co?currentSchema=schema_gestion_co";
-			String user = "postgres";
-			String passwd = "bonjour";
-			conn = DriverManager.getConnection(url, user, passwd);
-			Statement state = conn.createStatement();
+			Statement state = gestion_commande.conn.createStatement();
 			state.execute(sql);
 			JOptionPane.showMessageDialog(this, "Ajout dans la table " + nomTable + " réussi");
 		} catch (Exception e) {
@@ -293,16 +288,11 @@ public class Article extends JFrame implements ActionListener {
 		sql += "WHERE ref_article = " + serial;
 
 		System.out.println(sql);
-		Connection conn = null;
 		try {
-			Class.forName("org.postgresql.Driver");
-			String url = "jdbc:postgresql://localhost:5432/base_gestion_co?currentSchema=schema_gestion_co";
-			String user = "postgres";
-			String passwd = "bonjour";
-			conn = DriverManager.getConnection(url, user, passwd);
-			Statement state = conn.createStatement();
+			Statement state = gestion_commande.conn.createStatement();
 			state.execute(sql);
 			JOptionPane.showMessageDialog(this, "Modification dans la table " + nomTable + " réussie");
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 			JOptionPane.showMessageDialog(this, e.getMessage());
@@ -337,8 +327,9 @@ public class Article extends JFrame implements ActionListener {
 					}
 				}
 			}			
-		}		
-		return row;		
+		}
+		row.add("" + row.get(3));
+		return row;
 	}
 
 	public boolean formulaireFull(JPanel nomPanel) {
@@ -358,17 +349,17 @@ public class Article extends JFrame implements ActionListener {
 	}
 	
 	public DefaultTableModel getModel(String nomTable) {
+		update_stock_transitionnel();
 		DefaultTableModel modelTmp = new DefaultTableModel();
-		Connection conn = null;
-		try {
-			Class.forName("org.postgresql.Driver");
-			String url = "jdbc:postgresql://localhost:5432/base_gestion_co?currentSchema=schema_gestion_co";
-			String user = "postgres";
-			String passwd = "bonjour";
-			conn = DriverManager.getConnection(url, user, passwd);
-			Statement state = conn.createStatement();			
-			
-			String sql = "select * from " + nomTable + " order by ref_article";
+
+		try {			
+			Statement state = gestion_commande.conn.createStatement();
+			String colonnes = "ref_article as \"Référence\","
+					+ " lib_article as \"Libellé\", px_achat as \"Prix d'achat\","
+					+ " px_vente as \"Prix de vente\", stock_transitionnel as \"Stock en transit\","
+					+ " stock_dispo as \"Stock disponible\"";
+			String sql = "select " + colonnes + " from " + nomTable + " order by ref_article";
+			System.out.println(sql);
 			ResultSet result = state.executeQuery(sql);
 			ResultSetMetaData resultMeta = result.getMetaData();			
 			
@@ -397,5 +388,31 @@ public class Article extends JFrame implements ActionListener {
 			JOptionPane.showMessageDialog(this, e.getMessage());
 		}
 		return modelTmp;
+	}
+	public void update_stock_transitionnel() {
+		String sql = "UPDATE article " + 
+				"set stock_transitionnel = 0; " + 
+				"UPDATE article " + 
+				"SET stock_transitionnel = stock_transitionnel - ligne_de_commande.qte_commande " + 
+				"from ligne_de_commande, commande " + 
+				"where article.ref_article = ligne_de_commande.ref_article " + 
+				"AND ligne_de_commande.ref_commande = commande.ref_commande " + 
+				"and statut_commande = 'EN-COURS' " + 
+				"and type_commande = 'VENTE'; " + 
+				"UPDATE article " + 
+				"SET stock_transitionnel = stock_transitionnel + ligne_de_commande.qte_commande " + 
+				"from ligne_de_commande, commande " + 
+				"where article.ref_article = ligne_de_commande.ref_article " + 
+				"AND ligne_de_commande.ref_commande = commande.ref_commande " + 
+				"and statut_commande = 'EN-COURS' " + 
+				"and type_commande = 'ACHAT';";
+		try {
+			Statement stock_trans_update = gestion_commande.conn.createStatement();
+			stock_trans_update.execute(sql);
+			System.out.println("stock_transitionnel mis à jour");
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}		
 	}
 }

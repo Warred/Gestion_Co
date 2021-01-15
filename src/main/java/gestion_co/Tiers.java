@@ -54,8 +54,8 @@ public class Tiers extends JFrame implements ActionListener{
 	JPanel panelTextTiers = new JPanel();
 	
 	public Tiers() {
-		setTitle("Tiers");
- 	    setBounds(100,100,1000,500); 
+		JFrame f = new JFrame("Tiers");
+		f.setSize(1000, 500);
 	    
  	    JPanel panelFond = new JPanel();//Un panel est un espace dans lequel on peut placer des composants graphiques
  	    panelFond.setLayout(new GridLayout(2, 1));
@@ -197,8 +197,11 @@ public class Tiers extends JFrame implements ActionListener{
 	    panelHaut.setBorder(bord);
 	    panelFond.add(panelHaut);
 	    panelFond.add(sp);	    
-	    			
-	    this.add(panelFond);
+	    
+	    f.setResizable(false);
+		f.setLocationRelativeTo(null);
+		f.setVisible(true);
+	    f.add(panelFond);
 	    
 	    addTiers.addActionListener(this);
 	    editTiers.addActionListener(this);
@@ -229,12 +232,6 @@ public class Tiers extends JFrame implements ActionListener{
 	    
 	}
 
-	public static void main(String[] args) {
-		Tiers f = new Tiers();
-		f.setVisible(true);
-		f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-	}
-
 	public void actionPerformed(ActionEvent clic) {			
 		if (clic.getSource() == addTiers) {			
 			if (formulaireFull(panelTextTiers)) {				
@@ -242,6 +239,8 @@ public class Tiers extends JFrame implements ActionListener{
 					modelTiers = getModel("tiers");
 					jtableTiers.setModel(modelTiers);
 					videText();
+					gestion_commande.combo_choix_tiers();
+					gestion_commande.afficher_table();
 				}
 			}
 		
@@ -282,6 +281,8 @@ public class Tiers extends JFrame implements ActionListener{
 						modelTiers = getModel("tiers");
 						jtableTiers.setModel(modelTiers);
 						videText();
+						gestion_commande.combo_choix_tiers();
+						gestion_commande.afficher_table();
 					}
 				} else JOptionPane.showMessageDialog(this, "Remplir tout les renseignements pour ajouter un tiers");
 			} else JOptionPane.showMessageDialog(this, "Selectionner un tiers à modifier dans le JTable");
