@@ -35,6 +35,7 @@ public class gestion_commande {
 	static  String num_cde = "";
 	static String date_cde ="";
 	static String type_cde="";
+	static String name_tiers = "";
 	static String num_tiers="";
 	static String statut_cde="";
 	static Connection conn = null;
@@ -153,12 +154,11 @@ public class gestion_commande {
 						num_cde = table.getValueAt(num_ligne,0).toString();
 						date_cde = table.getValueAt(num_ligne, 1).toString();
 						type_cde = table.getValueAt(num_ligne, 2).toString();
-						num_tiers = table.getValueAt(num_ligne, 3).toString();
+						name_tiers = table.getValueAt(num_ligne, 3).toString();
 						statut_cde = table.getValueAt(num_ligne, 4).toString();
 						renvoie_tiers();
 						detail_commande c = new detail_commande();
-					}
-			
+					}			
 				}
 		});
 
@@ -192,8 +192,10 @@ public class gestion_commande {
 		public void actionPerformed(ActionEvent e) {
 			gestion_commande.connection();
 			Statement state2;
-			
-			String sql = "SELECT commande.ref_commande, date_commande, type_commande, commande.code_tiers, statut_commande"
+			 
+			String sql = "SELECT commande.ref_commande as \"N° de commande\", date_commande as \"Date\","
+					+ " type_commande as \"Type\", name(code_tiers) as \"Tiers\""
+					+ ", statut_commande as \"Statut\""
 				+ "  FROM commande join ligne_de_commande "
 				+ "on commande.ref_commande = ligne_de_commande.ref_commande WHERE ";
 			
@@ -279,13 +281,14 @@ public class gestion_commande {
 	
 	public void renvoie_tiers () {
 		connection();
-		PreparedStatement state1;
+		Statement state1;
 		
 		try {
-			state1 = conn.prepareStatement("select * from tiers where code_tiers = ?");
-			int num_tiers2= Integer.parseInt(num_tiers);
-			state1.setInt(1, num_tiers2);
-			ResultSet result1 = state1.executeQuery();
+			state1 = conn.createStatement();
+			num_tiers = name_tiers.split(" ")[0];
+			String sql = "select * from tiers where code_tiers = " + num_tiers;
+			System.out.println(sql);
+			ResultSet result1 = state1.executeQuery(sql);
 			while (result1.next()) {
 				nom_tiers = result1.getString("nom");
 				prenom_tiers = result1.getString("prenom");
@@ -325,8 +328,12 @@ public class gestion_commande {
 		connection();
 		try {
 		Statement state = conn.createStatement();
-		String req = ("select * from commande;");
-		ResultSet result = state.executeQuery(req);
+		String sql = ("select ref_commande as \"N° de commande\", date_commande as \"Date\",");
+		sql += " type_commande as \"Type\", name(code_tiers) as \"Tiers\", statut_commande as \"Statut\"";
+		sql += " FROM commande order by ref_commande;";
+		System.out.println(sql);
+		
+		ResultSet result = state.executeQuery(sql);
 		ResultSetMetaData resultMeta = result.getMetaData();
 
 		// les entetes du tableau
