@@ -3,8 +3,10 @@ import static javax.swing.JOptionPane.ERROR_MESSAGE;
 import static javax.swing.JOptionPane.showMessageDialog;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -14,6 +16,8 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
@@ -32,6 +36,7 @@ public class detail_commande extends JFrame {
 	private static final long serialVersionUID = -9089674941204792262L;
 	DefaultTableModel model2 = new DefaultTableModel();
     JTable table2 = new JTable(model2);
+    JScrollPane sp = new JScrollPane(table2);
 	
     JButton bouton_ajouter_ligne =new JButton("Ajouter Ligne");
 	JButton bouton_supprimer_ligne =new JButton("Supprimer Ligne");
@@ -100,10 +105,7 @@ public class detail_commande extends JFrame {
 		gc2.fill = GridBagConstraints.BOTH;
 		gc2.weightx = 6;
 		gc2.weighty = 10;
-		gc2.insets = new Insets(5, 5, 5, 5);
-		
-		
-		
+		gc2.insets = new Insets(5, 5, 5, 5);		
 		
 		//1ere ligne
 		gc2.gridx = 0;
@@ -316,15 +318,17 @@ public class detail_commande extends JFrame {
 		panel1.add(val_total_ttc, gc2);
 		charger_donnees();
 		
-		f.setLayout(new BorderLayout());
-		f.getContentPane().add(panel1, BorderLayout.NORTH);
-		f.getContentPane().add(new JScrollPane(table2), BorderLayout.SOUTH);
+		sp.setPreferredSize(new Dimension(300, 300));
 
 		/* Définition de la fenêtre */
-		f.setSize(1000, 900);
+		f.setSize(1000, 600);
 		f.setResizable(false);
 		f.setLocationRelativeTo(null);
 		f.setVisible(true);
+		
+		f.setLayout(new BorderLayout());
+		f.getContentPane().add(panel1, BorderLayout.NORTH);
+		f.getContentPane().add(sp, BorderLayout.SOUTH);
 		
 		
 		bouton_ajouter_ligne.addActionListener(new ActionListener() {
@@ -349,6 +353,7 @@ public class detail_commande extends JFrame {
 					stk_dispo.setVisible(true);
 					val_stk_dispo.setText(null);
 					val_stk_dispo.setVisible(true);
+					sp.setPreferredSize(new Dimension(300,200));
 					}
 				}
 		});
@@ -385,6 +390,7 @@ public class detail_commande extends JFrame {
 						val_stk_dispo.setVisible(true);
 						bouton_valider_modif.setVisible(true);
 						bouton_quitter_sans_valider.setVisible(true);
+						sp.setPreferredSize(new Dimension(300, 200));
 
 					}	
 					}	
@@ -466,6 +472,7 @@ public class detail_commande extends JFrame {
 						stk_dispo.setVisible(false);
 						val_stk_dispo.setVisible(false);
 						calcul_montants();
+						sp.setPreferredSize(new Dimension(300, 300));
 						} catch (SQLException e1) {
 							// TODO Auto-generated catch block
 							e1.printStackTrace();
@@ -518,6 +525,7 @@ public class detail_commande extends JFrame {
 					bouton_quitter_sans_valider.setVisible(false);
 					
 					calcul_montants();
+					sp.setPreferredSize(new Dimension(300, 300));
 					
 					} catch (SQLException e1) {
 						// TODO Auto-generated catch block
@@ -545,6 +553,7 @@ public class detail_commande extends JFrame {
 					stk_dispo.setVisible(false);
 					val_stk_dispo.setText(null);
 					val_stk_dispo.setVisible(false);
+					sp.setPreferredSize(new Dimension(300, 300));
 
 				}
 		});
@@ -571,6 +580,7 @@ public class detail_commande extends JFrame {
 					gestion_commande.model.setColumnCount(0);
 					gestion_commande.model.setRowCount(0);
 					gestion_commande.afficher_table();
+					sp.setPreferredSize(new Dimension(300, 300));
 					
 					
 					} catch (SQLException e1) {
@@ -664,27 +674,26 @@ public class detail_commande extends JFrame {
 		model2.setColumnCount(0);
 		model2.setRowCount(0);
 		charger_donnees();
-	}
-	
-	
+	}	
 	
 		@SuppressWarnings("unchecked")
 		public void ajouter_ligne () {
-			gestion_commande.connection();
+
 			try {
 			Statement state = gestion_commande.conn.createStatement();
-			String req = ("select lib_article from article;");
+			String req = ("select lib_article from article order by ref_article;");
 			ResultSet result = state.executeQuery(req);
 			ResultSetMetaData resultMeta = result.getMetaData();
+			article.clear();
 			article.add("");
 			while (result.next()) {
 				for (int i=1; i <=resultMeta.getColumnCount(); i++) {
 					article.add(result.getString(i));
 				}				
 			}
-			choix_article = new JComboBox(article.toArray());
-			choix_article.setSelectedIndex(0);
-			
+			DefaultComboBoxModel test = new DefaultComboBoxModel(article.toArray());
+			choix_article.setModel(test);
+			choix_article.setSelectedIndex(0);			
 
 			result.close();
 			state.close();
