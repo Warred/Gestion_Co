@@ -6,7 +6,6 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -364,7 +363,7 @@ public class detail_commande extends JFrame {
 					
 					if (num_ligne ==-1) {
 						showMessageDialog(null, "Vous devez sélectionner au moins une ligne", "Erreur", ERROR_MESSAGE);
-					} else if  (val_statut_cde.getText().contentEquals("VALIDEE")) {
+					} else if (val_statut_cde.getText().contentEquals("VALIDEE")) {
 						showMessageDialog(null, "Vous ne pouvez pas modifier une commande validée.", "Erreur", ERROR_MESSAGE);
 					} else {
 						id_ligne = table2.getValueAt(num_ligne,0).toString();
@@ -390,10 +389,9 @@ public class detail_commande extends JFrame {
 						val_stk_dispo.setVisible(true);
 						bouton_valider_modif.setVisible(true);
 						bouton_quitter_sans_valider.setVisible(true);
-						sp.setPreferredSize(new Dimension(300, 200));
-
+						sp.setPreferredSize(new Dimension(300,200));
 					}	
-					}	
+				}	
 		});
 
 		 
@@ -526,7 +524,6 @@ public class detail_commande extends JFrame {
 					
 					calcul_montants();
 					sp.setPreferredSize(new Dimension(300, 300));
-					
 					} catch (SQLException e1) {
 						// TODO Auto-generated catch block
 						e1.printStackTrace();
@@ -554,7 +551,6 @@ public class detail_commande extends JFrame {
 					val_stk_dispo.setText(null);
 					val_stk_dispo.setVisible(false);
 					sp.setPreferredSize(new Dimension(300, 300));
-
 				}
 		});
 		 
@@ -580,8 +576,7 @@ public class detail_commande extends JFrame {
 					gestion_commande.model.setColumnCount(0);
 					gestion_commande.model.setRowCount(0);
 					gestion_commande.afficher_table();
-					sp.setPreferredSize(new Dimension(300, 300));
-					
+					sp.setPreferredSize(new Dimension(300, 300));					
 					
 					} catch (SQLException e1) {
 						// TODO Auto-generated catch block
@@ -610,12 +605,8 @@ public class detail_commande extends JFrame {
 						e1.printStackTrace();
 					}
 				}
-		});
-		 
+		});		 
 	}
-
-
-
 	
 	public void charger_donnees () {
 		gestion_commande.connection();
@@ -641,8 +632,6 @@ public class detail_commande extends JFrame {
 			e.printStackTrace();
 		}
 	}
-	
-
 	
 	public void calcul_montants () {
 		gestion_commande.connection();
@@ -678,7 +667,6 @@ public class detail_commande extends JFrame {
 	
 		@SuppressWarnings("unchecked")
 		public void ajouter_ligne () {
-
 			try {
 			Statement state = gestion_commande.conn.createStatement();
 			String req = ("select lib_article from article order by ref_article;");

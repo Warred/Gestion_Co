@@ -55,6 +55,10 @@ public class creer_commande extends JFrame {
 	JLabel chx_art = new JLabel("Sélectionner article");
 	JLabel stk_dispo = new JLabel("Stock dispo.");
 	JLabel label_statut_cde = new JLabel("Statut Cde.");
+	
+	JLabel label_remise = new JLabel("Remise");
+	JTextField val_remise = new JTextField ();
+	
 	JTextField val_num_cde = new JTextField ();
 	JTextField val_date_cde = new JTextField ();
 	JTextField val_type_cde = new JTextField ();
@@ -75,6 +79,14 @@ public class creer_commande extends JFrame {
 	JTextField val_statut_cde = new JTextField ();
 	String id_ligne;
 	
+	JLabel label_total_ht = new JLabel("Total HT");
+	JLabel label_tva = new JLabel("TVA");
+	JLabel label_total_ttc = new JLabel("Total TTC");
+	
+	JTextField val_total_ht = new JTextField ();
+	JTextField val_tva = new JTextField ();
+	JTextField val_total_ttc = new JTextField ();
+	
 	JComboBox choix_article = new JComboBox();
 	JComboBox choix_type_cde = new JComboBox();
 	JComboBox choix_tiers = new JComboBox();
@@ -83,6 +95,10 @@ public class creer_commande extends JFrame {
 	ArrayList<Object> tiers = new ArrayList<Object>();
 	ArrayList<Object> type_de_cde = new ArrayList<Object>();
 	ArrayList<Object> array_remise = new ArrayList<Object>();
+	
+
+
+	
 	
 	public creer_commande()  {
 		JFrame f = new JFrame("Création commande");
@@ -194,11 +210,7 @@ public class creer_commande extends JFrame {
 		gc2.gridy = 2;
 		gc2.gridwidth = 1;
 		panel1.add(label_statut_cde, gc2);
-	
-		
-		
-		
-		
+
 		gc2.gridx = 4;
 		gc2.gridy = 3;
 		gc2.gridwidth = 2;
@@ -268,6 +280,38 @@ public class creer_commande extends JFrame {
 		gc2.gridy = 8;
 		panel1.add(bouton_quitter_sans_valid, gc2);
 		bouton_quitter_sans_valid.setVisible(false);
+
+		gc2.gridx = 3;
+		gc2.gridy = 8;
+		panel1.add(label_remise, gc2);
+		label_remise.setVisible(false);
+		gc2.gridx = 4;
+		gc2.gridy = 8;
+		panel1.add(val_remise, gc2);
+		val_remise.setVisible(false);
+		
+		
+		gc2.gridx = 3;
+		gc2.gridy = 9;
+		panel1.add(label_total_ht, gc2);
+		gc2.gridx = 3;
+		gc2.gridy = 10;
+		panel1.add(val_total_ht, gc2);
+		val_total_ht.setEditable(false);
+		gc2.gridx = 4;
+		gc2.gridy = 9;
+		panel1.add(label_tva, gc2);
+		gc2.gridx = 4;
+		gc2.gridy = 10;
+		panel1.add(val_tva, gc2);
+		val_tva.setEditable(false);
+		gc2.gridx = 5;
+		gc2.gridy = 9;
+		panel1.add(label_total_ttc, gc2);
+		gc2.gridx = 5;
+		gc2.gridy = 10;
+		panel1.add(val_total_ttc, gc2);
+		val_total_ttc.setEditable(false);
 		
 		
 		
@@ -300,6 +344,8 @@ public class creer_commande extends JFrame {
 					val_stk_dispo.setText(null);
 					val_stk_dispo.setVisible(true);
 					bouton_quitter_sans_valid.setVisible(true);
+					label_remise.setVisible(true);
+					val_remise.setVisible(true);
 				
 				}
 		});
@@ -334,6 +380,8 @@ public class creer_commande extends JFrame {
 						val_stk_dispo.setVisible(true);
 						bouton_valider_modif.setVisible(true);
 						bouton_quitter_sans_valid.setVisible(true);
+						val_remise.setVisible(true);
+						label_remise.setVisible(true);
 					}	
 					}	
 		});
@@ -362,6 +410,7 @@ public class creer_commande extends JFrame {
 						model_creer_cde.setColumnCount(0);
 						model_creer_cde.setRowCount(0);
 						charger_donnees();
+						calcul_montants();
 					}
 				}
 		});
@@ -377,9 +426,18 @@ public class creer_commande extends JFrame {
 						int num_cde = Integer.parseInt(val_num_cde.getText());
 						int ref_art = Integer.parseInt(val_ref_art.getText());
 						String lib_art = choix_article.getSelectedItem().toString();
-						float px_art = Float.parseFloat(val_pu.getText());
+						double px_art2;
+						double px_art;
+						double px_art3;
+				
+						if (val_remise.getText().isEmpty()){
+							px_art = Float.parseFloat(val_pu.getText());
+						} else {
+							px_art2=Float.parseFloat(val_pu.getText())-((Float.parseFloat(val_pu.getText())/100)*Float.parseFloat(val_remise.getText()));
+							px_art3 = Math.round(px_art2*1000);	
+							px_art=px_art3/1000;
+						}
 						int qte_art = Integer.parseInt(val_qte_cde.getText());
-						System.out.println(val_type.getText());
 						if ( val_type.getText().equals("VENTE") && 
 								(qte_art> Integer.parseInt(val_stk_dispo.getText()) || qte_art <=0 || val_qte_cde.getText() ==null) ) {
 							showMessageDialog(null, "La quantité doit être comprise entre 1 et la quantité en stock disponible.", "Erreur", ERROR_MESSAGE);
@@ -389,7 +447,7 @@ public class creer_commande extends JFrame {
 						state2.setInt(1, num_cde);
 						state2.setInt(2, ref_art);
 						state2.setString(3, lib_art);
-						state2.setFloat(4, px_art);
+						state2.setDouble(4, px_art);
 						state2.setInt(5, qte_art);
 						int result2 = state2.executeUpdate();
 						
@@ -410,7 +468,11 @@ public class creer_commande extends JFrame {
 						model_creer_cde.setColumnCount(0);
 						model_creer_cde.setRowCount(0);
 						charger_donnees();
+						calcul_montants();
 						bouton_quitter_sans_valid.setVisible(false);
+						val_remise.setText("");
+						val_remise.setVisible(false);
+						label_remise.setVisible(false);
 						
 						
 						
@@ -429,10 +491,21 @@ public class creer_commande extends JFrame {
 					PreparedStatement state2;
 					
 					int id_ligne2 = Integer.parseInt(id_ligne);
-					int num_cde = Integer.parseInt(gestion_commande.num_cde);
+					int num_cde = Integer.parseInt(val_num_cde.getText());
 					int ref_art = Integer.parseInt(val_ref_art.getText());
 					String lib_art = choix_article.getSelectedItem().toString();
-					float px_art = Float.parseFloat(val_pu.getText());
+					double px_art2;
+					double px_art;
+					double px_art3;
+			System.out.println(val_remise.getText());
+					if (val_remise.getText().isEmpty()){
+						px_art = Float.parseFloat(val_pu.getText());
+					} else {
+						px_art2=Float.parseFloat(val_pu.getText())-((Float.parseFloat(val_pu.getText())/100)*Float.parseFloat(val_remise.getText()));
+						px_art3 = Math.round(px_art2*1000);	
+						px_art=px_art3/1000;
+					}
+					
 					int qte_art = Integer.parseInt(val_qte_cde.getText());
 					try {
 					state2 = gestion_commande.conn.prepareStatement("UPDATE ligne_de_commande SET ref_commande = ?,"
@@ -444,7 +517,7 @@ public class creer_commande extends JFrame {
 					state2.setInt(1, num_cde);
 					state2.setInt(2, ref_art);
 					state2.setString(3, lib_art);
-					state2.setFloat(4, px_art );
+					state2.setDouble(4, px_art );
 					state2.setInt(5, qte_art);
 					state2.setInt(6, id_ligne2 );
 					int result2 = state2.executeUpdate();
@@ -462,7 +535,13 @@ public class creer_commande extends JFrame {
 					chx_art.setVisible(false);
 					stk_dispo.setVisible(false);
 					val_stk_dispo.setVisible(false);
-					
+					val_remise.setVisible(false);
+					label_remise.setVisible(false);
+					val_remise.setText("");
+					model_creer_cde.setColumnCount(0);
+					model_creer_cde.setRowCount(0);
+					charger_donnees();
+					calcul_montants();
 					} catch (SQLException e1) {
 						// TODO Auto-generated catch block
 						e1.printStackTrace();
@@ -629,6 +708,7 @@ public class creer_commande extends JFrame {
 							gestion_commande.model.setColumnCount(0);
 							gestion_commande.model.setRowCount(0);
 							gestion_commande.afficher_table();
+							calcul_montants();
 					} else {
 						showMessageDialog(null, "Vous devez selectionner au moins un type de commande et un tiers.", "Erreur", ERROR_MESSAGE);
 						
@@ -767,7 +847,9 @@ public class creer_commande extends JFrame {
 			try {
 				Statement stock_trans_update = gestion_commande.conn.createStatement();
 				stock_trans_update.execute(sql);
-				System.out.println("stock_transitionnel mis à jour");
+				
+				showMessageDialog(null, "Stock_transitionnel mis à jour.", "Info", INFORMATION_MESSAGE);
+	
 			} catch (SQLException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -806,5 +888,31 @@ public class creer_commande extends JFrame {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}		
+		}
+		
+		public void calcul_montants () {
+			gestion_commande.connection();
+			PreparedStatement state2;
+			int num_cde2= Integer.parseInt(val_num_cde.getText().toString());
+			float montant_ht;
+			float montant_tva;
+			float montant_ttc;
+			try {
+			state2 = gestion_commande.conn.prepareStatement("SELECT SUM(qte_commande*px_vente) from ligne_de_commande where ref_commande = ?");
+			state2.setInt(1, num_cde2);
+			ResultSet result2 = state2.executeQuery();
+			
+			 while(result2.next()) {
+				 montant_ht=result2.getFloat(1);
+				 val_total_ht.setText(montant_ht+"");
+				 montant_tva=montant_ht/5;
+				 val_tva.setText(montant_tva+"");
+				 montant_ttc = montant_tva+montant_ht;
+				 val_total_ttc.setText(montant_ttc+"");
+				 }		 
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 }

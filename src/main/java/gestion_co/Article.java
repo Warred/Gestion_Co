@@ -8,8 +8,6 @@ import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
@@ -53,7 +51,6 @@ public class Article extends JFrame implements ActionListener {
 	public Article() {
 		JFrame f = new JFrame("Articles");
 		f.setSize(1000, 500);
-		
 
  	    JPanel panelFond = new JPanel();//Un panel est un espace dans lequel on peut placer des composants graphiques
  	    panelFond.setLayout(new GridLayout(2, 1));
@@ -64,13 +61,13 @@ public class Article extends JFrame implements ActionListener {
  	    panelLabel.setLayout(new GridLayout(7,1));    
  	    
  	    JLabel videLabel = new JLabel("");
- 		JLabel videlabel2 = new JLabel("");
+ 	    JLabel videlabel2 = new JLabel("");
  		JLabel label_lib_article = new JLabel("Libellé :");
  		JLabel label_px_achat = new JLabel("Prix d'achat :");
  		JLabel label_px_vente = new JLabel("Prix de vente :");
  		JLabel label_stock_dispo = new JLabel("Stock disponible :");
  		
-	    JPanel align = new JPanel();
+ 		JPanel align = new JPanel();
 	    align.setLayout(new BorderLayout());
 	    align.add(videlabel2, BorderLayout.EAST);
 	    panelLabel.add(align);
@@ -188,7 +185,7 @@ public class Article extends JFrame implements ActionListener {
 	    
 	    panelFond.add(panelHaut);
 	    panelFond.add(sp);	    
-	    
+	    			
 	    f.setResizable(false);
 		f.setLocationRelativeTo(null);
 		f.setVisible(true);
@@ -229,9 +226,9 @@ public class Article extends JFrame implements ActionListener {
 			if (!str.isEmpty()) {
 				boolean trouve = false;
 				String nomTable = "article where lib_article ilike '%" + str + "%'";
-								
+				
 				for (int i = 0; i < modelArt.getRowCount(); i++) {
-					if (modelArt.getValueAt(i, 1).toString().toLowerCase().contains(str)) {
+					if (modelArt.getValueAt(i, 1).toString().toLowerCase().contains(str)) {						
 						trouve = true;
 					}
 				}
@@ -292,7 +289,6 @@ public class Article extends JFrame implements ActionListener {
 			Statement state = gestion_commande.conn.createStatement();
 			state.execute(sql);
 			JOptionPane.showMessageDialog(this, "Modification dans la table " + nomTable + " réussie");
-			
 		} catch (Exception e) {
 			e.printStackTrace();
 			JOptionPane.showMessageDialog(this, e.getMessage());
@@ -329,7 +325,7 @@ public class Article extends JFrame implements ActionListener {
 			}			
 		}
 		row.add("" + row.get(3));
-		return row;
+		return row;		
 	}
 
 	public boolean formulaireFull(JPanel nomPanel) {
@@ -351,7 +347,6 @@ public class Article extends JFrame implements ActionListener {
 	public DefaultTableModel getModel(String nomTable) {
 		update_stock_transitionnel();
 		DefaultTableModel modelTmp = new DefaultTableModel();
-
 		try {			
 			Statement state = gestion_commande.conn.createStatement();
 			String colonnes = "ref_article as \"Référence\","
@@ -389,6 +384,7 @@ public class Article extends JFrame implements ActionListener {
 		}
 		return modelTmp;
 	}
+	
 	public void update_stock_transitionnel() {
 		String sql = "UPDATE article " + 
 				"set stock_transitionnel = 0; " + 

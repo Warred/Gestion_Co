@@ -197,7 +197,7 @@ public class Tiers extends JFrame implements ActionListener{
 	    panelHaut.setBorder(bord);
 	    panelFond.add(panelHaut);
 	    panelFond.add(sp);	    
-	    
+	    			
 	    f.setResizable(false);
 		f.setLocationRelativeTo(null);
 		f.setVisible(true);
@@ -388,8 +388,8 @@ public class Tiers extends JFrame implements ActionListener{
 			Class.forName("org.postgresql.Driver");
 			String url = "jdbc:postgresql://localhost:5432/base_gestion_co?currentSchema=schema_gestion_co";
 			String user = "postgres";
-			
-			conn = DriverManager.getConnection(url, user, gestion_commande.passwd);
+			String passwd = "bonjour";
+			conn = DriverManager.getConnection(url, user, passwd);
 			Statement state = conn.createStatement();
 			
 			

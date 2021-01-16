@@ -15,7 +15,6 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 
-import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -26,8 +25,6 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
-import javax.swing.event.ListDataListener;
-import javax.swing.event.TableModelEvent;
 import javax.swing.table.DefaultTableModel;
 import static javax.swing.JOptionPane.*;
 
@@ -79,21 +76,22 @@ public class gestion_commande {
 		JPanel panel1 = new JPanel();
 		JPanel pan_haut = new JPanel();
 		JPanel panel_menu = new JPanel();
-		passwd = (String) JOptionPane.showInputDialog(f, "Entrez votre mot de passe");
+		passwd = (String) JOptionPane.showInputDialog(f, "Entrez votre mot de passe psql");
+	    
 		connection();
 		afficher_table();
 		combo_statut_cde();
 		combo_type_cde();
 		combo_choix_tiers();
 		combo_choix_article();
-	    
+		
 	    bouton_afficher_commande =new JButton("Afficher commande");
 	    bouton_creer_commnde =new JButton("Créer commande");
 	    bouton_supprimer_commande =new JButton("Supprimer commande");
 		bouton_valider_recherche =new JButton("Valider recherche");
 		bouton_afficher_article = new JButton("Menu articles");
 		bouton_afficher_tiers = new JButton("Menu tiers");
-		
+
 		panel1.setLayout(new GridBagLayout());
 		GridBagConstraints gc2 = new GridBagConstraints();
 		gc2.weightx = 4;
@@ -139,7 +137,6 @@ public class gestion_commande {
 		gc2.gridx = 0 ;
 		gc2.gridy = 5;
 		panel1.add(new JLabel(""), gc2);
-		
 		gc2.gridx = 1;
 		gc2.gridy = 6;
 		panel1.add(bouton_afficher_commande, gc2);
@@ -150,7 +147,7 @@ public class gestion_commande {
 		panel_menu.add(bouton_creer_commnde);
 		panel_menu.add(bouton_afficher_article);
 		panel_menu.add(bouton_afficher_tiers);
-		
+
 		pan_haut.setLayout(new BorderLayout());
 		pan_haut.add(panel1, BorderLayout.SOUTH);
 
@@ -171,7 +168,7 @@ public class gestion_commande {
 				Tiers t1 = new Tiers();				
 			}
 		});
-		
+
 		bouton_afficher_article.addActionListener(new ActionListener() {			
 			public void actionPerformed(ActionEvent e) {
 				Article a1 = new Article();				
@@ -191,7 +188,8 @@ public class gestion_commande {
 						statut_cde = table.getValueAt(num_ligne, 4).toString();
 						renvoie_tiers();
 						detail_commande c = new detail_commande();
-					}			
+					}
+			
 				}
 		});
 
@@ -225,7 +223,7 @@ public class gestion_commande {
 		public void actionPerformed(ActionEvent e) {
 			gestion_commande.connection();
 			Statement state2;
-			 
+			
 			String sql = "SELECT commande.ref_commande as \"N° de commande\", date_commande as \"Date\","
 					+ " type_commande as \"Type\", name(code_tiers) as \"Tiers\""
 					+ ", statut_commande as \"Statut\""
@@ -363,10 +361,11 @@ public class gestion_commande {
 		sql += " type_commande as \"Type\", name(code_tiers) as \"Tiers\", statut_commande as \"Statut\"";
 		sql += " FROM commande order by ref_commande;";
 		System.out.println(sql);
-		
+
 		ResultSet result = state.executeQuery(sql);
 		ResultSetMetaData resultMeta = result.getMetaData();
 		DefaultTableModel tmp = new DefaultTableModel();
+
 		// les entetes du tableau
 		for (int i = 1; i <= resultMeta.getColumnCount(); i++) {
 			tmp.addColumn(resultMeta.getColumnName(i).toUpperCase());
@@ -381,7 +380,6 @@ public class gestion_commande {
 		}
 		model = tmp;
 		table.setModel(model);
-		
 		result.close();
 		state.close();
 		} catch (Exception e) {
@@ -410,7 +408,7 @@ public class gestion_commande {
 	@SuppressWarnings("unchecked")
 	public static void combo_choix_tiers () {
 		try {
-		Statement state = gestion_commande.conn.createStatement();
+		Statement state = conn.createStatement();
 		String req = ("select code_tiers, nom, prenom, raison_social from tiers order by code_tiers;");
 		ResultSet result = state.executeQuery(req);
 		ResultSetMetaData resultMeta = result.getMetaData();
@@ -425,11 +423,9 @@ public class gestion_commande {
 				
 			}	tiers.add(nom);			
 		}
-		
 		DefaultComboBoxModel test = new DefaultComboBoxModel(tiers.toArray());
 		choix_tiers.setModel(test);
 		choix_tiers.setSelectedIndex(0);
-		
 		result.close();
 		state.close();
 		} catch (Exception e) {
@@ -440,8 +436,8 @@ public class gestion_commande {
 	@SuppressWarnings("unchecked")
 	public static void combo_choix_article () {
 		try {
-		Statement state = gestion_commande.conn.createStatement();
-		String req = ("select ref_article, lib_article from article;");
+		Statement state = conn.createStatement();
+		String req = ("select ref_article, lib_article from article order by ref_article;");
 		ResultSet result = state.executeQuery(req);
 		ResultSetMetaData resultMeta = result.getMetaData();
 		article.clear();
