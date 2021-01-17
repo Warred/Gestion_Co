@@ -14,6 +14,8 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.time.LocalDate;
 import java.util.ArrayList;
+
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
@@ -89,10 +91,10 @@ public class creer_commande extends JFrame {
 	
 	JComboBox choix_article = new JComboBox();
 	JComboBox choix_type_cde = new JComboBox();
-	JComboBox choix_tiers = new JComboBox();
+	static JComboBox choix_tiers = new JComboBox();
 	JComboBox combo_remise = new JComboBox();
 	ArrayList<Object> article = new ArrayList<Object>();
-	ArrayList<Object> tiers = new ArrayList<Object>();
+	static ArrayList<Object> tiers = new ArrayList<Object>();
 	ArrayList<Object> type_de_cde = new ArrayList<Object>();
 	ArrayList<Object> array_remise = new ArrayList<Object>();
 	
@@ -730,10 +732,9 @@ public class creer_commande extends JFrame {
 	
 		@SuppressWarnings("unchecked")
 		public void combo_article () {
-			gestion_commande.connection();
 			try {
 			Statement state = gestion_commande.conn.createStatement();
-			String req = ("select lib_article from article;");
+			String req = ("select lib_article from article order by lib_article;");
 			ResultSet result = state.executeQuery(req);
 			ResultSetMetaData resultMeta = result.getMetaData();
 			article.add("");
@@ -754,27 +755,27 @@ public class creer_commande extends JFrame {
 		}
 	
 		@SuppressWarnings("unchecked")
-		public void combo_tiers () {
-			gestion_commande.connection();
+		public static void combo_tiers () {
 			try {
 			Statement state = gestion_commande.conn.createStatement();
-			String req = ("select code_tiers, nom, prenom, raison_social from tiers;");
+			String req = ("select code_tiers, nom, prenom, raison_social from tiers order by code_tiers;");
 			ResultSet result = state.executeQuery(req);
 			ResultSetMetaData resultMeta = result.getMetaData();
+			tiers.clear();
 			tiers.add("");
 			while (result.next()) {
 				String nom ="";
 				for (int i=1; i <=resultMeta.getColumnCount(); i++) {
-					if (result.getString(i)!= null) {
+					if (result.getString(i)!= null && !result.getString(i).equals("")) {
 						nom = nom+" "+result.getString(i);
 					}
 					
-				}	tiers.add(nom);			
+				} tiers.add(nom);			
 			}
-			choix_tiers = new JComboBox(tiers.toArray());
+			DefaultComboBoxModel test = new DefaultComboBoxModel(tiers.toArray());
+			choix_tiers.setModel(test);
 			choix_tiers.setSelectedIndex(0);
 			
-
 			result.close();
 			state.close();
 			} catch (Exception e) {

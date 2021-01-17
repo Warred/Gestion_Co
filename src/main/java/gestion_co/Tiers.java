@@ -241,6 +241,7 @@ public class Tiers extends JFrame implements ActionListener{
 					videText();
 					gestion_commande.combo_choix_tiers();
 					gestion_commande.afficher_table();
+					creer_commande.combo_tiers();
 				}
 			}
 		
@@ -283,6 +284,7 @@ public class Tiers extends JFrame implements ActionListener{
 						videText();
 						gestion_commande.combo_choix_tiers();
 						gestion_commande.afficher_table();
+						creer_commande.combo_tiers();
 					}
 				} else JOptionPane.showMessageDialog(this, "Remplir tout les renseignements pour ajouter un tiers");
 			} else JOptionPane.showMessageDialog(this, "Selectionner un tiers à modifier dans le JTable");
@@ -383,20 +385,12 @@ public class Tiers extends JFrame implements ActionListener{
 	
 	public DefaultTableModel getModel(String nomTable) {
 		DefaultTableModel modelTmp = new DefaultTableModel();
-		Connection conn = null;
 		try {
-			Class.forName("org.postgresql.Driver");
-			String url = "jdbc:postgresql://localhost:5432/base_gestion_co?currentSchema=schema_gestion_co";
-			String user = "postgres";
-			String passwd = "bonjour";
-			conn = DriverManager.getConnection(url, user, passwd);
-			Statement state = conn.createStatement();
-			
+			Statement state = gestion_commande.conn.createStatement();			
 			
 			String sql = "select * from " + nomTable + " order by code_tiers";
 			ResultSet result = state.executeQuery(sql);
-			ResultSetMetaData resultMeta = result.getMetaData();
-			
+			ResultSetMetaData resultMeta = result.getMetaData();			
 			
 			int nbCol = resultMeta.getColumnCount();
 			String[] nomDesColonnes = new String[nbCol];
